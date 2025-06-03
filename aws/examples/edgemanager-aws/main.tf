@@ -10,5 +10,6 @@ module "edgemanager-example" {
   key_name       = "xxxxxxxxxxxxxxxxx"        # key pair name
   oem_name       = "edgemanager"
   app_version    = "2.25.0"
-  aws_account_id = "xxxxxxxxxxxxxxxxx"        # aws account id
+  aws_account_id = "xxxxxxxxxxxxxxxxx"                   # aws account id
+  ssh_pub_key    = "ssh-rsa xxxxxxxxxxxxxxxxx user@host" # custom ssh public key
 }
