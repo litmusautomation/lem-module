@@ -33,6 +33,7 @@ variable "oem_name" {
 variable "ssh_pub_key" {
   description = "The user-defined public SSH key added to the virtual machine for access."
   type        = string
+  default     = ""
 }
 
 variable "subnet_id" {
