@@ -1,0 +1,56 @@
+variable "cloud_platform" {
+  description = "The cloud platform to deploy the application on."
+  type        = string
+  validation {
+    condition     = contains(["aws", "azure"], var.cloud_platform)
+    error_message = "Invalid cloud platform. Accepted values are: 'aws' or 'azure'."
+  }
+}
+
+variable "admin_user_name" {
+  description = "The admin user account to be created on the virtual machine."
+  type        = string
+  default     = "ubuntu"
+}
+
+variable "app_version" {
+  description = "The application version to be deployed."
+  type        = string
+}
+
+variable "aws_account_id" {
+  description = "The AWS account ID that owns the AMI."
+  type        = string
+}
+
+variable "key_name" {
+  description = "The name of the SSH key pair used for VM access."
+  type        = string
+}
+
+variable "name" {
+  description = "The identifier assigned to resources for easier management."
+  type        = string
+}
+
+variable "oem_name" {
+  description = "The OEM name associated with the virtual machine."
+  type        = string
+  default     = "edgemanager"
+}
+
+variable "ssh_pub_key" {
+  description = "The user-defined public SSH key added to the virtual machine for access."
+  type        = string
+  default     = ""
+}
+
+variable "subnet_id" {
+  description = "The ID of the target subnet where the virtual machine will be deployed."
+  type        = string
+}
+
+variable "vpc_id" {
+  description = "The ID of the target VPC where the virtual machine will be deployed."
+  type        = string
+}
