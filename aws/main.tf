@@ -9,6 +9,6 @@ module "edgemanager-aws" {
   ami_owner       = var.aws_account_id
   user_data       = data.cloudinit_config.config.rendered
 
-  ingress_cidr_blocks     = ["0.0.0.0/0"]
-  ingress_cidr_ssh_blocks = ["0.0.0.0/0"]
+  ingress_cidr_blocks     = var.ingress_cidr_blocks
+  ingress_cidr_ssh_blocks = var.ingress_cidr_ssh_blocks
 }

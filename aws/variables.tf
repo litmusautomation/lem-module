@@ -14,6 +14,18 @@ variable "aws_account_id" {
   type        = string
 }
 
+variable "ingress_cidr_blocks" {
+  description = "A list of CIDR blocks allowed to access the instance."
+  type        = list(string)
+  default     = []
+}
+
+variable "ingress_cidr_ssh_blocks" {
+  description = "A list of CIDR blocks allowed SSH access to the instance."
+  type        = list(string)
+  default     = []
+}
+
 variable "key_name" {
   description = "The name of the SSH key pair used for VM access."
   type        = string
