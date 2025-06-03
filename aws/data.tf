@@ -7,7 +7,14 @@ locals {
         # https://cloudinit.readthedocs.io/en/latest/reference/examples.html 
         EOT
     }]
-    set_ssh_key = (var.ssh_pub_key != "") ? [{ content = templatefile("${path.cwd}/aws/cloudinit/add-ssh-key.tmpl", { custom_ssh_pub_key = var.ssh_pub_key }) }] : []
+    set_ssh_key = [{
+      content = <<-EOT
+        #cloud-config
+
+        runcmd:
+          - echo ${var.ssh_pub_key} >> /home/${var.admin_user_name}/.ssh/authorized_keys
+        EOT
+    }]
   }
 }
 
