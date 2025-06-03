@@ -1,12 +1,3 @@
-variable "cloud_platform" {
-  description = "The cloud platform to deploy the application on."
-  type        = string
-  validation {
-    condition     = contains(["aws", "azure"], var.cloud_platform)
-    error_message = "Invalid cloud platform. Accepted values are: 'aws' or 'azure'."
-  }
-}
-
 variable "admin_user_name" {
   description = "The admin user account to be created on the virtual machine."
   type        = string
