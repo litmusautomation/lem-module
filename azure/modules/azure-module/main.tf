@@ -35,17 +35,3 @@ resource "azurerm_virtual_machine" "edgemanager_vm" {
 
   tags = merge(local.tags, var.tags)
 }
-
-resource "azurerm_network_interface" "edgemanager_nic" {
-  name                = "${var.name}-nic"
-  location            = data.azurerm_location.default.location
-  resource_group_name = var.resource_group_name
-
-  ip_configuration {
-    name                          = "${var.name}-nic-ipconfig"
-    subnet_id                     = data.azurerm_subnet.subnet.id
-    private_ip_address_allocation = var.address_allocation
-  }
-
-  tags = merge(local.tags, var.tags)
-}

@@ -100,13 +100,13 @@ module "edgemanager_security_group" {
       description = "PROMETHEUS"
       cidr_blocks = join(",", var.ingress_cidr_blocks)
     },
-    {
-      from_port   = 22
-      to_port     = 22
-      protocol    = "tcp"
-      description = "SSH from specified subnets"
-      cidr_blocks = join(",", var.ingress_cidr_ssh_blocks)
-    },
+    # {
+    #   from_port   = 22
+    #   to_port     = 22
+    #   protocol    = "tcp"
+    #   description = "SSH from specified subnets"
+    #   cidr_blocks = join(",", var.ingress_cidr_ssh_blocks)
+    # },
   ]
 
   tags = merge(local.tags, var.tags)
