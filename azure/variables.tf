@@ -1,6 +1,7 @@
 variable "admin_user_name" {
   type        = string
   description = "The administrator username for the VM."
+  default     = "ubuntu"
 }
 
 variable "app_version" {

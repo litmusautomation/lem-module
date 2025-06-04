@@ -8,10 +8,6 @@ terraform {
       source  = "hashicorp/cloudinit"
       version = "2.3.6"
     }
-    cloudflare = {
-      source  = "cloudflare/cloudflare"
-      version = "~> 4"
-    }
   }
   required_version = ">= 1.5.7"
 }
