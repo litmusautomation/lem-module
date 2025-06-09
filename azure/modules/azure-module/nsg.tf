@@ -9,7 +9,7 @@ locals {
   udp_ports = [
     51820, 123
   ]
-  
+
   denied_ports = [
     22
   ]
