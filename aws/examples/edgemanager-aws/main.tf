@@ -10,7 +10,7 @@ module "edgemanager-example" {
   vpc_id                  = "vpc-xxxxxxxxxxxxxxxxx"               # vpc id
   subnet_id               = "subnet-xxxxxxxxxxxxxxxxx"            # subnet id
   key_name                = "xxxxxxxxxxxxxxxxx"                   # key pair name
-  aws_account_id          = "xxxxxxxxxxxxxxxxx"                   # aws account id
+  ami_owner               = "xxxxxxxxxxxxxxxxx"                   # aws account id
   ssh_pub_key             = "ssh-rsa xxxxxxxxxxxxxxxxx user@host" # optional custom ssh public key
   ingress_cidr_blocks     = ["0.0.0.0/0"]
   ingress_cidr_ssh_blocks = ["0.0.0.0/0"]

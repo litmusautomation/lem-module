@@ -6,7 +6,7 @@ module "edgemanager-aws" {
   admin_user_name = var.admin_user_name
   key_name        = var.key_name
   image_version   = "${var.oem_name}-${var.app_version}"
-  ami_owner       = var.aws_account_id
+  ami_owner       = var.ami_owner
   user_data       = data.cloudinit_config.config.rendered
 
   # optional parameters

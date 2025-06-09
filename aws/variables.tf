@@ -9,7 +9,7 @@ variable "app_version" {
   type        = string
 }
 
-variable "aws_account_id" {
+variable "ami_owner" {
   description = "The AWS account ID that owns the AMI."
   type        = string
 }
