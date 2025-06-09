@@ -1,37 +1,24 @@
-resource "azurerm_virtual_machine" "edgemanager_vm" {
-  name                  = "${var.name}-vm"
+resource "azurerm_linux_virtual_machine" "edgemanager_vm" {
+  name                  = var.name
   location              = data.azurerm_location.default.location
   resource_group_name   = var.resource_group_name
+  size                  = var.vm_size
+  admin_username        = var.admin_user_name
   network_interface_ids = [azurerm_network_interface.edgemanager_nic.id]
-  vm_size               = var.vm_size
 
-  # This means the OS Disk will be deleted when Terraform destroys the Virtual Machine
-  # NOTE: This may not be optimal in all cases.
-  delete_os_disk_on_termination = true
-
-  storage_os_disk {
-    name              = "${var.name}-disk1"
-    caching           = "ReadWrite"
-    create_option     = "FromImage"
-    managed_disk_type = "Standard_LRS"
+  admin_ssh_key {
+    username   = var.admin_user_name
+    public_key = var.custom_ssh_pub_key
   }
 
-  storage_image_reference {
-    id = data.azurerm_image.edgemanager_image.id
+  os_disk {
+    name                 = "${var.name}-disk1"
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
   }
 
-  os_profile {
-    computer_name  = "${var.name}-server"
-    admin_username = var.admin_user_name
-    custom_data    = var.custom_data
-  }
-  os_profile_linux_config {
-    disable_password_authentication = true
-    ssh_keys {
-      path     = "/home/${var.admin_user_name}/.ssh/authorized_keys"
-      key_data = var.custom_ssh_pub_key
-    }
-  }
+  custom_data     = base64encode(var.custom_data)
+  source_image_id = data.azurerm_image.edgemanager_image.id
 
   tags = merge(local.tags, var.tags)
 }
