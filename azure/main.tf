@@ -10,4 +10,8 @@ module "edgemanager-azure" {
   image_resource_group_name = var.image_resource_group_name
   custom_ssh_pub_key        = var.ssh_pub_key
   custom_data               = data.cloudinit_config.config.rendered
+
+  # optional parameters
+  ingress_cidr_blocks     = var.ingress_cidr_blocks
+  ingress_cidr_ssh_blocks = var.ingress_cidr_ssh_blocks
 }

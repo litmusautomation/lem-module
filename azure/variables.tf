@@ -14,6 +14,18 @@ variable "image_resource_group_name" {
   description = "The name of the resource group where the VM image is stored."
 }
 
+variable "ingress_cidr_blocks" {
+  description = "A list of CIDR blocks allowed to access the instance."
+  type        = list(string)
+  default     = []
+}
+
+variable "ingress_cidr_ssh_blocks" {
+  description = "A list of CIDR blocks allowed SSH access to the instance."
+  type        = list(string)
+  default     = []
+}
+
 variable "location" {
   type        = string
   description = "The Azure region where resources will be deployed."

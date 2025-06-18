@@ -30,7 +30,7 @@ resource "azurerm_network_security_group" "edgemanager_nsg" {
       protocol                   = "Tcp"
       source_port_range          = "*"
       destination_port_range     = tostring(security_rule.value)
-      source_address_prefix      = "*"
+      source_address_prefixes    = var.ingress_cidr_blocks
       destination_address_prefix = "*"
     }
   }
@@ -45,7 +45,7 @@ resource "azurerm_network_security_group" "edgemanager_nsg" {
       protocol                   = "Udp"
       source_port_range          = "*"
       destination_port_range     = tostring(security_rule.value)
-      source_address_prefix      = "*"
+      source_address_prefixes    = var.ingress_cidr_blocks
       destination_address_prefix = "*"
     }
   }
@@ -53,14 +53,14 @@ resource "azurerm_network_security_group" "edgemanager_nsg" {
   dynamic "security_rule" {
     for_each = local.denied_ports
     content {
-      name                       = "deny-tcp-${security_rule.value}"
-      priority                   = 300 + index(local.denied_ports, security_rule.value)
-      direction                  = "Inbound"
-      access                     = "Deny"
-      protocol                   = "Tcp"
-      source_port_range          = "*"
-      destination_port_range     = tostring(security_rule.value)
-      source_address_prefix      = "*"
+      name                   = "deny-tcp-${security_rule.value}"
+      priority               = 300 + index(local.denied_ports, security_rule.value)
+      direction              = "Inbound"
+      access                 = "Deny"
+      protocol               = "Tcp"
+      source_port_range      = "*"
+      destination_port_range = tostring(security_rule.value)
+      source_address_prefix  = "*"
       destination_address_prefix = "*"
     }
   }

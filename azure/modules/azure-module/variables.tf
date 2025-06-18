@@ -30,6 +30,18 @@ variable "image_version" {
   description = "The version of the image to use for the virtual machine."
 }
 
+variable "ingress_cidr_blocks" {
+  type        = list(string)
+  description = "A list of IPv4 CIDR ranges to be used for all ingress rules except SSH."
+  default     = ["0.0.0.0/0"]
+}
+
+variable "ingress_cidr_ssh_blocks" {
+  type        = list(string)
+  description = "A list of CIDR blocks allowed to SSH into the virtual machine."
+  default     = ["0.0.0.0/0"]
+}
+
 variable "location" {
   type        = string
   description = "The Azure location where resources will be deployed."
