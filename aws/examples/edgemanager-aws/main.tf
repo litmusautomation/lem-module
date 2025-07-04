@@ -3,15 +3,16 @@ provider "aws" {
 }
 
 module "edgemanager-example" {
-  source                  = "git@github.com:litmusautomation/lem-module//aws?ref=main"
-  name                    = "edgemanager-example-aws"
-  oem_name                = "edgemanager"
-  app_version             = "2.25.0"
-  vpc_id                  = "vpc-xxxxxxxxxxxxxxxxx"               # vpc id
-  subnet_id               = "subnet-xxxxxxxxxxxxxxxxx"            # subnet id
-  key_name                = "xxxxxxxxxxxxxxxxx"                   # key pair name
-  ami_owner               = "xxxxxxxxxxxxxxxxx"                   # aws account id
-  ssh_pub_key             = "ssh-rsa xxxxxxxxxxxxxxxxx user@host" # optional custom ssh public key
+  source = "git@github:litmusautomation/lem-module//aws?ref=LIT-2881-lem-terraform-public"
+  # source                  = "git@github.com:litmusautomation/lem-module//aws?ref=main"
+  name                    = var.name
+  oem_name                = var.oem_name    # name of the edge manager
+  app_version             = var.app_version # version of the application
+  vpc_id                  = var.vpc_id      # vpc id
+  subnet_id               = var.subnet_id   # subnet id
+  key_name                = var.key_name    # key pair name
+  ami_owner               = var.ami_owner   # aws account id
+  ssh_pub_key             = var.ssh_pub_key # optional custom ssh public key
   ingress_cidr_blocks     = ["0.0.0.0/0"]
   ingress_cidr_ssh_blocks = ["0.0.0.0/0"]
 }

@@ -1,0 +1,41 @@
+name: LEM deployment
+
+on:
+  workflow_dispatch:
+
+jobs:
+  lem-tf-plan:
+    name: tf-plan
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: aws/examples/edgemanager-aws
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.5
+
+      - name: tf-init
+        run: terraform init
+
+      - name: tf-plan
+        id: plan
+        run: terraform plan
+
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: "us-east-1"
+      TF_VAR_name: "edgemanager-2.25.0-aws-github"
+      TF_VAR_vpc_id: ${{ secrets.VPC_ID }}
+      TF_VAR_subnet_id: ${{ secrets.SUBNET_ID }}
+      TF_VAR_key_name: ${{ secrets.KEY_NAME }}
+      TF_VAR_oem_name: "edgemanager"
+      TF_VAR_app_version: "2.25.0"
+      TF_VAR_ami_owner: ${{ secrets.AMI_OWNER }}
+      TF_VAR_ssh_pub_key: ${{ secrets.SSH_PUB_KEY }}
