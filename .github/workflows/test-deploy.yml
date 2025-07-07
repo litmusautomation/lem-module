@@ -23,6 +23,7 @@ on:
         default: "deploy"
         type: choice
         options:
+          - plan
           - deploy
           - destroy
 
