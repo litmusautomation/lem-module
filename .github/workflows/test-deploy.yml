@@ -26,7 +26,8 @@ jobs:
           terraform_version: 1.7.5
 
       - name: set state
-        run: echo "${{ secrets.TF_STATE_CONTENT }}" > state.tf
+        run: |
+          printf "%s" "$STATE" > state.tf
 
       - name: tf-init
         run: terraform init
@@ -36,6 +37,7 @@ jobs:
         run: terraform plan
 
     env:
+      STATE: ${{ secrets.TF_STATE_CONTENT }}
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_REGION: "us-east-1"
