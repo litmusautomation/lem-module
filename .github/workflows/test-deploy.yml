@@ -25,6 +25,9 @@ jobs:
         with:
           terraform_version: 1.7.5
 
+      - name: set state
+        run: echo "${{ secrets.TF_STATE_CONTENT }}" > state.tf
+
       - name: tf-init
         run: terraform init
 
