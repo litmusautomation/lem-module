@@ -26,9 +26,17 @@ on:
           - plan
           - deploy
           - destroy
+      CLOUD:
+        description: "Which cloud provider?"
+        required: true
+        default: "aws"
+        type: choice
+        options:
+          - aws
+          - azure
 
 jobs:
-  lem-tf-plan:
+  lem-tf-plan-aws:
     name: tf-plan
     runs-on: ubuntu-latest
     defaults:
@@ -60,10 +68,10 @@ jobs:
         id: plan
         run: terraform plan
 
-  lem-tf-deploy:
+  lem-tf-deploy-aws:
     name: tf-deploy
-    needs: lem-tf-plan
-    if: ${{ github.event.inputs.RUN == 'deploy' }}
+    needs: lem-tf-plan-aws
+    if: ${{ github.event.inputs.RUN == 'deploy' && github.event.inputs.CLOUD == 'aws' }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -94,10 +102,10 @@ jobs:
         id: apply
         run: terraform apply -auto-approve
 
-  lem-tf-destroy:
+  lem-tf-destroy-aws:
     name: tf-destroy
-    needs: lem-tf-plan
-    if: ${{ github.event.inputs.RUN == 'destroy' }}
+    needs: lem-tf-plan-aws
+    if: ${{ github.event.inputs.RUN == 'destroy' && github.event.inputs.CLOUD == 'aws' }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -127,3 +135,35 @@ jobs:
       - name: tf-destroy
         id: destroy
         run: terraform destroy -auto-approve
+
+  lem-tf-plan-azure:
+    name: tf-plan
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: azure/examples/edgemanager-azure
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.5
+
+      - name: set state
+        run: |
+          printf "%s" "$STATE" > state.tf
+
+      - name: tf-init
+        run: terraform init
+
+      - name: tf-plan
+        id: plan
+        run: terraform plan
