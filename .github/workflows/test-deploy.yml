@@ -5,6 +5,7 @@ env:
   TF_VAR_name: "edgemanager-2.25.0-github-workflow"
   TF_VAR_oem_name: "edgemanager"
   TF_VAR_app_version: "2.25.0"
+  TF_VAR_ssh_pub_key: ${{ secrets.SSH_PUB_KEY }}
 
 on:
   workflow_dispatch:
@@ -42,7 +43,6 @@ jobs:
       TF_VAR_subnet_id: ${{ secrets.SUBNET_ID }}
       TF_VAR_key_name: ${{ secrets.KEY_NAME }}
       TF_VAR_ami_owner: ${{ secrets.AMI_OWNER }}
-      TF_VAR_ssh_pub_key: ${{ secrets.SSH_PUB_KEY }}
 
     steps:
       - name: Checkout repository
@@ -85,7 +85,6 @@ jobs:
       TF_VAR_subnet_id: ${{ secrets.SUBNET_ID }}
       TF_VAR_key_name: ${{ secrets.KEY_NAME }}
       TF_VAR_ami_owner: ${{ secrets.AMI_OWNER }}
-      TF_VAR_ssh_pub_key: ${{ secrets.SSH_PUB_KEY }}
 
     steps:
       - name: Checkout repository
@@ -128,7 +127,6 @@ jobs:
       TF_VAR_subnet_id: ${{ secrets.SUBNET_ID }}
       TF_VAR_key_name: ${{ secrets.KEY_NAME }}
       TF_VAR_ami_owner: ${{ secrets.AMI_OWNER }}
-      TF_VAR_ssh_pub_key: ${{ secrets.SSH_PUB_KEY }}
 
     steps:
       - name: Checkout repository

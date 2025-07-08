@@ -13,6 +13,4 @@ module "edgemanager-example" {
   key_name                = var.key_name    # key pair name
   ami_owner               = var.ami_owner   # aws account id
   ssh_pub_key             = var.ssh_pub_key # optional custom ssh public key
-  ingress_cidr_blocks     = ["0.0.0.0/0"]
-  ingress_cidr_ssh_blocks = ["0.0.0.0/0"]
 }
