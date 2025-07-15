@@ -56,7 +56,7 @@ jobs:
           printf "%s" "$STATE" > state.tf
 
       - name: check state
-        run: cat state.tf
+        run: cat init.tf
 
       - name: tf-init
         run: terraform init
