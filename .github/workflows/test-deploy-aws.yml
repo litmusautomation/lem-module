@@ -53,10 +53,10 @@ jobs:
 
       - name: set state
         run: |
-          echo "${STATE}" > init.tf
+          echo "${STATE}" > state.tf
 
       - name: check state
-        run: cat init.tf
+        run: cat state.tf
 
       - name: tf-init
         run: terraform init
@@ -98,7 +98,7 @@ jobs:
 
       - name: set state
         run: |
-          echo "${STATE}" > init.tf
+          echo "${STATE}" > state.tf
 
       - name: tf-init
         run: terraform init
@@ -140,7 +140,7 @@ jobs:
 
       - name: set state
         run: |
-          echo "${STATE}" > init.tf
+          echo "${STATE}" > state.tf
 
       - name: tf-init
         run: terraform init
