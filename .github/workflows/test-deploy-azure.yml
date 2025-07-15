@@ -29,7 +29,7 @@ jobs:
       run:
         working-directory: azure/examples/edgemanager-azure
     env:
-      STATE: ${{ vars.TF_STATE_CONTENT_AZURE }}
+      STATE: ${{ secrets.TF_STATE_CONTENT_AZURE }}
       ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
       ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
@@ -58,9 +58,6 @@ jobs:
         run: |
           echo "${STATE}" > state.tf
 
-      - name: check state
-        run: cat state.tf
-
       - name: tf-init
         run: terraform init
 
@@ -77,7 +74,7 @@ jobs:
       run:
         working-directory: azure/examples/edgemanager-azure
     env:
-      STATE: ${{ vars.TF_STATE_CONTENT_AZURE }}
+      STATE: ${{ secrets.TF_STATE_CONTENT_AZURE }}
       ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
       ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
@@ -122,7 +119,7 @@ jobs:
       run:
         working-directory: azure/examples/edgemanager-azure
     env:
-      STATE: ${{ vars.TF_STATE_CONTENT_AZURE }}
+      STATE: ${{ secrets.TF_STATE_CONTENT_AZURE }}
       ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
       ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
