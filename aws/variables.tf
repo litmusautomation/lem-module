@@ -17,13 +17,13 @@ variable "ami_owner" {
 variable "ingress_cidr_blocks" {
   description = "A list of CIDR blocks allowed to access the instance."
   type        = list(string)
-  default     = []
+  default     = ["0.0.0.0/0"]
 }
 
 variable "ingress_cidr_ssh_blocks" {
   description = "A list of CIDR blocks allowed SSH access to the instance."
   type        = list(string)
-  default     = []
+  default     = ["0.0.0.0/0"]
 }
 
 variable "key_name" {
