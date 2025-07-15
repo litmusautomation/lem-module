@@ -57,6 +57,7 @@ jobs:
       - name: set state
         run: |
           printf "%s" "$STATE" > state.tf
+          cat state.tf
 
       - name: tf-init
         run: terraform init
