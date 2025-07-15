@@ -33,7 +33,7 @@ jobs:
   lem-tf-plan-aws:
     name: tf-plan-aws
     runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.RUN == 'plan' && github.event.inputs.CLOUD == 'aws' }}
+    if: ${{ github.event.inputs.CLOUD == 'aws' }}
     defaults:
       run:
         working-directory: aws/examples/edgemanager-aws
@@ -158,7 +158,7 @@ jobs:
   lem-tf-plan-azure:
     name: tf-plan-az
     runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.RUN == 'plan' && github.event.inputs.CLOUD == 'azure' }}
+    if: ${{ github.event.inputs.CLOUD == 'azure' }}
     defaults:
       run:
         working-directory: azure/examples/edgemanager-azure
