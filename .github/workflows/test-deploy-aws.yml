@@ -53,7 +53,7 @@ jobs:
 
       - name: set state
         run: |
-          printf "%s" "$STATE" > state.tf
+          printf "%s" "$STATE" > init.tf
 
       - name: check state
         run: cat init.tf
@@ -98,7 +98,7 @@ jobs:
 
       - name: set state
         run: |
-          printf "%s" "$STATE" > state.tf
+          printf "%s" "$STATE" > init.tf
 
       - name: tf-init
         run: terraform init
@@ -140,7 +140,7 @@ jobs:
 
       - name: set state
         run: |
-          printf "%s" "$STATE" > state.tf
+          printf "%s" "$STATE" > init.tf
 
       - name: tf-init
         run: terraform init
