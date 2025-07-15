@@ -1,4 +1,4 @@
-name: Test LEM deployment | AWS, Azure
+name: Test LEM deployment | Azure
 
 env:
   AWS_REGION: "us-east-1"
@@ -20,145 +20,11 @@ on:
           - plan
           - deploy
           - destroy
-      CLOUD:
-        description: "Which cloud provider?"
-        required: true
-        default: "aws"
-        type: choice
-        options:
-          - aws
-          - azure
 
 jobs:
-  lem-tf-plan-aws:
-    name: tf-plan-aws
-    runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.CLOUD == 'aws' }}
-    defaults:
-      run:
-        working-directory: aws/examples/edgemanager-aws
-    env:
-      STATE: ${{ secrets.TF_STATE_CONTENT_AWS }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      TF_VAR_vpc_id: ${{ secrets.VPC_ID }}
-      TF_VAR_subnet_id: ${{ secrets.SUBNET_ID }}
-      TF_VAR_key_name: ${{ secrets.KEY_NAME }}
-      TF_VAR_ami_owner: ${{ secrets.AMI_OWNER }}
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.7.5
-
-      - name: set state
-        run: |
-          printf "%s" "$STATE" > state.tf
-
-      - name: tf-init
-        run: terraform init
-
-      - name: tf-plan
-        id: plan
-        run: terraform plan
-
-  lem-tf-deploy-aws:
-    name: tf-deploy-aws
-    needs: lem-tf-plan-aws
-    if: ${{ github.event.inputs.RUN == 'deploy' && github.event.inputs.CLOUD == 'aws' }}
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: aws/examples/edgemanager-aws
-    env:
-      STATE: ${{ secrets.TF_STATE_CONTENT_AWS }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      TF_VAR_vpc_id: ${{ secrets.VPC_ID }}
-      TF_VAR_subnet_id: ${{ secrets.SUBNET_ID }}
-      TF_VAR_key_name: ${{ secrets.KEY_NAME }}
-      TF_VAR_ami_owner: ${{ secrets.AMI_OWNER }}
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.7.5
-
-      - name: set state
-        run: |
-          printf "%s" "$STATE" > state.tf
-
-      - name: tf-init
-        run: terraform init
-
-      - name: tf-apply
-        id: apply
-        run: terraform apply -auto-approve
-
-  lem-tf-destroy-aws:
-    name: tf-destroy-aws
-    needs: lem-tf-plan-aws
-    if: ${{ github.event.inputs.RUN == 'destroy' && github.event.inputs.CLOUD == 'aws' }}
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: aws/examples/edgemanager-aws
-    env:
-      STATE: ${{ secrets.TF_STATE_CONTENT_AWS }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      TF_VAR_vpc_id: ${{ secrets.VPC_ID }}
-      TF_VAR_subnet_id: ${{ secrets.SUBNET_ID }}
-      TF_VAR_key_name: ${{ secrets.KEY_NAME }}
-      TF_VAR_ami_owner: ${{ secrets.AMI_OWNER }}
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.7.5
-
-      - name: set state
-        run: |
-          printf "%s" "$STATE" > state.tf
-
-      - name: tf-init
-        run: terraform init
-
-      - name: tf-destroy
-        id: destroy
-        run: terraform destroy -auto-approve
-
   lem-tf-plan-azure:
     name: tf-plan-az
     runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.CLOUD == 'azure' }}
     defaults:
       run:
         working-directory: azure/examples/edgemanager-azure
@@ -203,7 +69,7 @@ jobs:
     name: tf-deploy-az
     runs-on: ubuntu-latest
     needs: lem-tf-plan-azure
-    if: ${{ github.event.inputs.RUN == 'deploy' && github.event.inputs.CLOUD == 'azure' }}
+    if: ${{ github.event.inputs.RUN == 'deploy' }}
     defaults:
       run:
         working-directory: azure/examples/edgemanager-azure
@@ -248,7 +114,7 @@ jobs:
     name: tf-destroy-az
     runs-on: ubuntu-latest
     needs: lem-tf-plan-azure
-    if: ${{ github.event.inputs.RUN == 'destroy' && github.event.inputs.CLOUD == 'azure' }}
+    if: ${{ github.event.inputs.RUN == 'destroy' }}
     defaults:
       run:
         working-directory: azure/examples/edgemanager-azure
