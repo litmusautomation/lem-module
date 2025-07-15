@@ -1,0 +1,156 @@
+name: Test LEM deployment | Azure
+
+env:
+  AWS_REGION: "us-east-1"
+  TF_VAR_name: "edgemanager-2.25.0-github-workflow"
+  TF_VAR_oem_name: "edgemanager"
+  TF_VAR_app_version: "2.25.0"
+  TF_VAR_ssh_pub_key: ${{ secrets.SSH_PUB_KEY }}
+  TF_VAR_admin_user_name: "ubuntu"
+
+on:
+  workflow_dispatch:
+    inputs:
+      RUN:
+        description: "What action to perform?"
+        required: true
+        default: "deploy"
+        type: choice
+        options:
+          - plan
+          - deploy
+          - destroy
+
+jobs:
+  lem-tf-plan-azure:
+    name: tf-plan-az
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: azure/examples/edgemanager-azure
+    env:
+      STATE: ${{ secrets.TF_STATE_CONTENT_AZURE }}
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+      TF_VAR_location: "East US"
+      TF_VAR_resource_group_name: ${{ secrets.RESOURCE_GROUP_NAME }}
+      TF_VAR_virtual_network_name: ${{ secrets.VNET_NAME }}
+      TF_VAR_subnet_id: ${{ secrets.SUBNET_NAME }}
+      TF_VAR_image_resource_group_name: ${{ secrets.IMAGE_RESOURCE_GROUP_NAME }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.5
+
+      - name: set state
+        run: |
+          printf "%s" "$STATE" > state.tf
+
+      - name: tf-init
+        run: terraform init
+
+      - name: tf-plan
+        id: plan
+        run: terraform plan
+
+  lem-tf-deploy-azure:
+    name: tf-deploy-az
+    runs-on: ubuntu-latest
+    needs: lem-tf-plan-azure
+    if: ${{ github.event.inputs.RUN == 'deploy' }}
+    defaults:
+      run:
+        working-directory: azure/examples/edgemanager-azure
+    env:
+      STATE: ${{ secrets.TF_STATE_CONTENT_AZURE }}
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+      TF_VAR_location: "East US"
+      TF_VAR_resource_group_name: ${{ secrets.RESOURCE_GROUP_NAME }}
+      TF_VAR_virtual_network_name: ${{ secrets.VNET_NAME }}
+      TF_VAR_subnet_id: ${{ secrets.SUBNET_NAME }}
+      TF_VAR_image_resource_group_name: ${{ secrets.IMAGE_RESOURCE_GROUP_NAME }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.5
+
+      - name: set state
+        run: |
+          printf "%s" "$STATE" > state.tf
+
+      - name: tf-init
+        run: terraform init
+
+      - name: tf-apply
+        id: apply
+        run: terraform apply -auto-approve
+
+  lem-tf-destroy-azure:
+    name: tf-destroy-az
+    runs-on: ubuntu-latest
+    needs: lem-tf-plan-azure
+    if: ${{ github.event.inputs.RUN == 'destroy' }}
+    defaults:
+      run:
+        working-directory: azure/examples/edgemanager-azure
+    env:
+      STATE: ${{ secrets.TF_STATE_CONTENT_AZURE }}
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+      TF_VAR_location: "East US"
+      TF_VAR_resource_group_name: ${{ secrets.RESOURCE_GROUP_NAME }}
+      TF_VAR_virtual_network_name: ${{ secrets.VNET_NAME }}
+      TF_VAR_subnet_id: ${{ secrets.SUBNET_NAME }}
+      TF_VAR_image_resource_group_name: ${{ secrets.IMAGE_RESOURCE_GROUP_NAME }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.5
+
+      - name: set state
+        run: |
+          printf "%s" "$STATE" > state.tf
+
+      - name: tf-init
+        run: terraform init
+
+      - name: tf-destroy
+        id: destroy
+        run: terraform destroy -auto-approve
