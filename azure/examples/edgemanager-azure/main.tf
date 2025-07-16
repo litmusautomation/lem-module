@@ -1,5 +1,5 @@
 module "edgemanager-example" {
-  source                    = "git@github.com:litmusautomation/lem-module//azure?ref=LIT-2881-lem-terraform-public"
+  source                    = "git@github.com:litmusautomation/lem-module//azure?ref=main"
   name                      = var.name
   oem_name                  = var.oem_name
   app_version               = var.app_version
