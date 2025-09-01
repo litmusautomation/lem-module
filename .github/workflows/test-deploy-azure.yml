@@ -8,6 +8,10 @@ env:
   TF_VAR_admin_user_name: "ubuntu"
 
 on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
   workflow_dispatch:
     inputs:
       RUN:
@@ -20,9 +24,9 @@ on:
           - deploy
           - destroy
       VERSION:
-        description: 'LEM targeted version'
+        description: "LEM targeted version"
         required: true
-        default: '2.25.0'
+        default: "2.25.0"
 
 jobs:
   lem-tf-plan-azure:
