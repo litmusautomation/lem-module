@@ -7,9 +7,7 @@
 - Modules assign a private IP to the instance, allowing communication within the VPC/VNet while maintaining internal networking.
 - SSH access is disabled by default, reinforcing security by preventing unauthorized remote access.
 
-#### State Management
-
-**Remote State Configuration:**
+#### State Management Configuration
 
 Both AWS and Azure modules support remote state backends for team collaboration and state locking.
 
