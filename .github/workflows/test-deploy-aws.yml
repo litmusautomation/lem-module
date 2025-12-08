@@ -2,9 +2,9 @@ name: Test LEM deployment | AWS
 
 env:
   AWS_REGION: "us-east-1"
-  TF_VAR_name: "edgemanager-${{ inputs.VERSION }}-github-workflow"
+  TF_VAR_name: "edgemanager-${{ inputs.VERSION || '2.30.0' }}-github-workflow"
   TF_VAR_oem_name: "edgemanager"
-  TF_VAR_app_version: ${{ inputs.VERSION }}
+  TF_VAR_app_version: ${{ inputs.VERSION || '2.30.0' }}
   TF_VAR_ssh_pub_key: ${{ secrets.SSH_PUB_KEY }}
   TF_VAR_admin_user_name: "ubuntu"
 
