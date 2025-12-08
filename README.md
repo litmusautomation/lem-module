@@ -14,6 +14,25 @@
 - Terraform >= v1.5.7
 - AWS access configured
 
+#### Security
+
+**SSH Access:**
+- SSH (port 22) is **explicitly disabled** for security reasons
+- Attempting to include port 22 in `ingress_tcp_ports` will result in a validation error
+- Azure deployments have an explicit deny rule for SSH traffic
+- AWS deployments omit SSH from security group rules
+
+**Network Security Best Practices:**
+- Always restrict `ingress_cidr_blocks` to your organization's IP ranges
+- Never use `0.0.0.0/0` in production environments
+- Use minimal port configuration for reduced attack surface
+- Minimum required ports: **443/tcp** (HTTPS) and **51820/udp** (WireGuard VPN)
+
+**Port Configuration:**
+- All port variables include validation to ensure required ports are present
+- Port 22 is automatically rejected if specified
+- Valid port range: 1-65535
+
 #### Usage
 
 See [Edgemanager AWS example](https://github.com/litmusautomation/lem-module/blob/main/aws/examples/edgemanager-aws/main.tf)
