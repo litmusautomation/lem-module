@@ -4,6 +4,12 @@ variable "admin_user_name" {
   default     = "ubuntu"
 }
 
+variable "region" {
+  description = "The AWS region where resources will be deployed."
+  type        = string
+  default     = "us-east-1"
+}
+
 variable "app_version" {
   description = "The application version to be deployed."
   type        = string
