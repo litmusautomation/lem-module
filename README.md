@@ -7,6 +7,47 @@
 - Modules assign a private IP to the instance, allowing communication within the VPC/VNet while maintaining internal networking.
 - SSH access is disabled by default, reinforcing security by preventing unauthorized remote access.
 
+#### State Management
+
+**Remote State Configuration:**
+
+Both AWS and Azure modules support remote state backends for team collaboration and state locking.
+
+**AWS Backend (S3):**
+```hcl
+# aws/state.tf
+terraform {
+  backend "s3" {
+    bucket = "your-terraform-state-bucket"
+    key    = "lem-module/aws/edgemanager/state"
+    region = "us-east-1"
+  }
+}
+```
+
+**Azure Backend (Azure Storage):**
+```hcl
+# azure/state.tf
+terraform {
+  backend "azurerm" {
+    resource_group_name  = "tfstate-resource-group"
+    storage_account_name = "yourterraformstate"
+    container_name       = "tfstate"
+    key                  = "lem-module/azure/edgemanager/state"
+  }
+}
+```
+
+**Configuration Files:**
+- `state.tf` - Backend configuration (ignored by git)
+- `secrets.auto.tfvars` - Deployment-specific values (ignored by git, automatically loaded)
+- Both files are excluded from version control via `.gitignore`
+
+**Important Notes:**
+- State files contain sensitive data and should never be committed to version control
+- Use remote backends (S3, Azure Storage) for team collaboration and state locking
+- The `.auto.tfvars` extension ensures automatic loading without explicit `-var-file` flag
+
 ### Deploying Edgemanager on AWS
 
 #### Requirements
@@ -110,6 +151,7 @@ module "edgemanager-example" {
   name                      = "edgemanager-example-azure"
   oem_name                  = "edgemanager"
   app_version               = "2.25.0"
+  subscription_id           = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
   location                  = "East US"
   resource_group_name       = "xxxxxxxxxxxxxxxxx"
   virtual_network_name      = "xxxxxxxxxxxxxxxxx"
@@ -133,6 +175,7 @@ module "edgemanager-example" {
 | `name`                      | Name assigned to resources                                           | string       | n/a                                                         | yes      |
 | `oem_name`                  | OEM identifier for the deployment                                    | string       | n/a                                                         | yes      |
 | `app_version`               | Application version to deploy                                        | string       | n/a                                                         | yes      |
+| `subscription_id`           | Azure subscription ID where resources will be deployed (sensitive)   | string       | n/a                                                         | yes      |
 | `location`                  | Azure region where resources will be created                         | string       | n/a                                                         | yes      |
 | `resource_group_name`       | Name of the Azure resource group                                     | string       | n/a                                                         | yes      |
 | `virtual_network_name`      | Name of the virtual network for the instance                         | string       | n/a                                                         | yes      |

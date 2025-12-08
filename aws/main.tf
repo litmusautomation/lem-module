@@ -1,3 +1,7 @@
+provider "aws" {
+  region = var.region
+}
+
 module "edgemanager-aws" {
   source          = "./modules/aws-module"
   name            = var.name
