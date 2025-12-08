@@ -1,3 +1,9 @@
+provider "azurerm" {
+  subscription_id                 = var.subscription_id
+  resource_provider_registrations = "none"
+  features {}
+}
+
 module "edgemanager-azure" {
   source                    = "./modules/azure-module"
   location                  = var.location
