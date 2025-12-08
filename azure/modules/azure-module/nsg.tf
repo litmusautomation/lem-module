@@ -1,14 +1,7 @@
 locals {
-  tcp_ports = [
-    80, 443, 8883,
-    9092, 8446, 9093,
-    8123, 8543, 9000,
-    9004, 9090,
-  ]
+  tcp_ports = var.ingress_tcp_ports
 
-  udp_ports = [
-    51820, 123
-  ]
+  udp_ports = var.ingress_udp_ports
 
   denied_ports = [
     22

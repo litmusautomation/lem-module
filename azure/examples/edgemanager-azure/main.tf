@@ -1,3 +1,9 @@
+provider "azurerm" {
+  subscription_id                 = var.subscription_id
+  resource_provider_registrations = "none"
+  features {}
+}
+
 module "edgemanager-example" {
   source                    = "git@github.com:litmusautomation/lem-module//azure?ref=main"
   name                      = var.name
@@ -9,4 +15,5 @@ module "edgemanager-example" {
   subnet_id                 = var.subnet_id
   image_resource_group_name = var.image_resource_group_name
   ssh_pub_key               = var.ssh_pub_key
+  subscription_id           = var.subscription_id
 }

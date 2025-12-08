@@ -3,6 +3,12 @@ variable "app_version" {
   type        = string
 }
 
+variable "region" {
+  description = "The AWS region where resources will be deployed."
+  type        = string
+  default     = "us-east-1"
+}
+
 variable "ami_owner" {
   description = "The AWS account ID that owns the AMI."
   type        = string

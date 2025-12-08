@@ -4,6 +4,12 @@ variable "admin_user_name" {
   default     = "ubuntu"
 }
 
+variable "subscription_id" {
+  type        = string
+  description = "The Azure subscription ID where resources will be deployed."
+  sensitive   = true
+}
+
 variable "app_version" {
   type        = string
   description = "The version of Edgemanager to deploy."

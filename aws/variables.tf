@@ -4,6 +4,12 @@ variable "admin_user_name" {
   default     = "ubuntu"
 }
 
+variable "region" {
+  description = "The AWS region where resources will be deployed."
+  type        = string
+  default     = "us-east-1"
+}
+
 variable "app_version" {
   description = "The application version to be deployed."
   type        = string
@@ -56,4 +62,41 @@ variable "subnet_id" {
 variable "vpc_id" {
   description = "The ID of the target VPC where the virtual machine will be deployed."
   type        = string
+}
+
+variable "ingress_tcp_ports" {
+  description = "List of TCP ports to allow ingress traffic. Minimum required: 443."
+  type        = list(number)
+  default = [
+    80, 443, 8883,
+    9092, 8446, 9093,
+    8123, 8543, 9000,
+    9004, 9090,
+  ]
+
+  validation {
+    condition     = !contains(var.ingress_tcp_ports, 22)
+    error_message = "SSH port 22 is not allowed for security reasons. SSH access is disabled on Edge Manager deployments."
+  }
+
+  validation {
+    condition     = contains(var.ingress_tcp_ports, 443)
+    error_message = "Port 443 (HTTPS) is required for Litmus Edge Manager functionality."
+  }
+}
+
+variable "ingress_udp_ports" {
+  description = "List of UDP ports to allow ingress traffic. Minimum required: 51820."
+  type        = list(number)
+  default     = [51820, 123]
+
+  validation {
+    condition     = contains(var.ingress_udp_ports, 51820)
+    error_message = "Port 51820 (WireGuard VPN) is required for Litmus Edge Manager functionality."
+  }
+
+  validation {
+    condition     = alltrue([for port in var.ingress_udp_ports : port >= 1 && port <= 65535])
+    error_message = "All UDP ports must be between 1 and 65535."
+  }
 }
