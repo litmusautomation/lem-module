@@ -14,4 +14,6 @@ module "edgemanager-azure" {
   # optional parameters
   ingress_cidr_blocks     = var.ingress_cidr_blocks
   ingress_cidr_ssh_blocks = var.ingress_cidr_ssh_blocks
+  ingress_tcp_ports       = var.ingress_tcp_ports
+  ingress_udp_ports       = var.ingress_udp_ports
 }

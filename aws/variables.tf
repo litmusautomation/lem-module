@@ -63,3 +63,20 @@ variable "vpc_id" {
   description = "The ID of the target VPC where the virtual machine will be deployed."
   type        = string
 }
+
+variable "ingress_tcp_ports" {
+  description = "List of TCP ports to allow ingress traffic. Minimum required: 443."
+  type        = list(number)
+  default = [
+    80, 443, 8883,
+    9092, 8446, 9093,
+    8123, 8543, 9000,
+    9004, 9090,
+  ]
+}
+
+variable "ingress_udp_ports" {
+  description = "List of UDP ports to allow ingress traffic. Minimum required: 51820."
+  type        = list(number)
+  default     = [51820, 123]
+}

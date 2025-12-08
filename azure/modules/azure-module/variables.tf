@@ -81,3 +81,20 @@ variable "vm_size" {
   description = "The size of the virtual machine instance."
   default     = "Standard_B4ms"
 }
+
+variable "ingress_tcp_ports" {
+  type        = list(number)
+  description = "List of TCP ports to allow ingress traffic. Minimum required: 443."
+  default = [
+    80, 443, 8883,
+    9092, 8446, 9093,
+    8123, 8543, 9000,
+    9004, 9090,
+  ]
+}
+
+variable "ingress_udp_ports" {
+  type        = list(number)
+  description = "List of UDP ports to allow ingress traffic. Minimum required: 51820."
+  default     = [51820, 123]
+}
