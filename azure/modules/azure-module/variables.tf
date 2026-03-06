@@ -55,7 +55,6 @@ variable "name" {
 variable "resource_group_name" {
   type        = string
   description = "The name of the Azure resource group."
-  default     = "undefined"
 }
 
 variable "subnet_id" {

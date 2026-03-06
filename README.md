@@ -91,7 +91,6 @@ module "edgemanager-example" {
   region                  = "us-west-2"
   ssh_pub_key             = "ssh-rsa xxxxxxxxxxxxxxxxx user@host"
   ingress_cidr_blocks     = ["0.0.0.0/0"]
-  ingress_cidr_ssh_blocks = ["0.0.0.0/0"]
   ingress_tcp_ports       = [443, 8883, 9092]  # Customize TCP ports
   ingress_udp_ports       = [51820]            # Customize UDP ports
 }
@@ -160,7 +159,6 @@ module "edgemanager-example" {
 
   # Optional parameters
   ingress_cidr_blocks     = ["0.0.0.0/0"]
-  ingress_cidr_ssh_blocks = ["0.0.0.0/0"]
   ingress_tcp_ports       = [443, 8883, 9092]  # Customize TCP ports
   ingress_udp_ports       = [51820]            # Customize UDP ports
 }

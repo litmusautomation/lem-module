@@ -12,7 +12,7 @@ data "azurerm_location" "default" {
 }
 
 data "azurerm_image" "edgemanager_image" {
-  name_regex          = "${var.image_version}-*"
+  name_regex          = "^${var.image_version}-"
   resource_group_name = var.image_resource_group_name
 }
 

@@ -66,6 +66,9 @@ jobs:
       - name: tf-init
         run: terraform init
 
+      - name: tf-validate
+        run: terraform validate
+
       - name: tf-plan
         id: plan
         run: terraform plan
