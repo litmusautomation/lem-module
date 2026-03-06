@@ -51,6 +51,7 @@ variable "oem_name" {
 variable "ssh_pub_key" {
   description = "The user-defined public SSH key added to the virtual machine for access."
   type        = string
+  sensitive   = true
   default     = ""
 }
 
@@ -88,6 +89,7 @@ variable "ingress_tcp_ports" {
     condition     = alltrue([for port in var.ingress_tcp_ports : port >= 1 && port <= 65535])
     error_message = "All TCP ports must be between 1 and 65535."
   }
+
 }
 
 variable "ingress_udp_ports" {
@@ -104,4 +106,5 @@ variable "ingress_udp_ports" {
     condition     = alltrue([for port in var.ingress_udp_ports : port >= 1 && port <= 65535])
     error_message = "All UDP ports must be between 1 and 65535."
   }
+
 }
