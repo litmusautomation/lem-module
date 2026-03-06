@@ -59,7 +59,7 @@ variable "ssh_pub_key" {
 
 variable "subnet_id" {
   type        = string
-  description = "The Azure subnet ID where the VM will be deployed."
+  description = "The name of the Azure subnet where the VM will be deployed."
 }
 
 variable "virtual_network_name" {
@@ -85,6 +85,11 @@ variable "ingress_tcp_ports" {
   validation {
     condition     = contains(var.ingress_tcp_ports, 443)
     error_message = "Port 443 (HTTPS) is required for Litmus Edge Manager functionality."
+  }
+
+  validation {
+    condition     = alltrue([for port in var.ingress_tcp_ports : port >= 1 && port <= 65535])
+    error_message = "All TCP ports must be between 1 and 65535."
   }
 }
 

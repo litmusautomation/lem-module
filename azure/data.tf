@@ -15,7 +15,7 @@ data "cloudinit_config" "config" {
   base64_encode = false
 
   dynamic "part" {
-    for_each = concat(local.cloudinit.default)
+    for_each = local.cloudinit.default
     content {
       content    = part.value.content
       merge_type = "list(append)+dict(recurse_array)+str()"

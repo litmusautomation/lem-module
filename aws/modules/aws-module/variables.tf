@@ -88,6 +88,11 @@ variable "ingress_tcp_ports" {
     condition     = contains(var.ingress_tcp_ports, 443)
     error_message = "Port 443 (HTTPS) is required for Litmus Edge Manager functionality."
   }
+
+  validation {
+    condition     = alltrue([for port in var.ingress_tcp_ports : port >= 1 && port <= 65535])
+    error_message = "All TCP ports must be between 1 and 65535."
+  }
 }
 
 variable "ingress_udp_ports" {

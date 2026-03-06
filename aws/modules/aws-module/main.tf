@@ -9,7 +9,7 @@ module "edgemanager_vm" {
   user_data_replace_on_change = true
 
   associate_public_ip_address = false
-  private_ip                  = var.private_ip != null ? var.private_ip : null
+  private_ip                  = var.private_ip
 
   subnet_id = data.aws_subnet.subnet.id
   vpc_security_group_ids = [

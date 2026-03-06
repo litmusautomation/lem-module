@@ -103,14 +103,15 @@ module "edgemanager-example" {
 | Name                      | Description                                                         | Type         | Default                                                     | Required |
 | ------------------------- | ------------------------------------------------------------------- | ------------ | ----------------------------------------------------------- | -------- |
 | `name`                    | Name assigned to resources                                          | string       | n/a                                                         | yes      |
-| `oem_name`                | OEM identifier for the deployment                                   | string       | n/a                                                         | yes      |
+| `oem_name`                | OEM identifier for the deployment                                   | string       | `"edgemanager"`                                             | no       |
 | `app_version`             | Application version to deploy                                       | string       | n/a                                                         | yes      |
 | `vpc_id`                  | VPC ID where resources will be deployed                             | string       | n/a                                                         | yes      |
 | `subnet_id`               | Subnet ID for EC2 instances                                         | string       | n/a                                                         | yes      |
 | `key_name`                | Name of the AWS EC2 key pair                                        | string       | n/a                                                         | yes      |
 | `ami_owner`               | AWS account ID owning the AMI                                       | string       | n/a                                                         | yes      |
 | `region`                  | AWS region where resources will be deployed                         | string       | `us-east-1`                                                 | no       |
-| `ssh_pub_key`             | Custom SSH public key (will not override default)                   | string       | `""`                                                        | no       |
+| `admin_user_name`         | Admin username created on the virtual machine                       | string       | `"ubuntu"`                                                  | no       |
+| `ssh_pub_key`             | Custom SSH public key appended to the VM via cloud-init             | string       | `""`                                                        | no       |
 | `ingress_cidr_blocks`     | List of CIDR blocks for application HTTP ingress                    | list(string) | `["0.0.0.0/0"]`                                             | no       |
 | `ingress_cidr_ssh_blocks` | List of CIDR blocks for SSH ingress                                 | list(string) | `["0.0.0.0/0"]`                                             | no       |
 | `ingress_tcp_ports`       | List of TCP ports to allow ingress traffic (minimum required: 443)  | list(number) | `[80, 443, 8883, 9092, 8446, 9093, 8123, 8543, 9000, 9004, 9090]` | no       |
@@ -180,6 +181,7 @@ module "edgemanager-example" {
 | `subnet_id`                 | Subnet name where the instance will be deployed                      | string       | n/a                                                         | yes      |
 | `image_resource_group_name` | Name of the resource group hosting the image                         | string       | n/a                                                         | yes      |
 | `ssh_pub_key`               | Custom SSH public key for authentication                             | string       | n/a                                                         | yes      |
+| `admin_user_name`           | Admin username created on the virtual machine                        | string       | `"ubuntu"`                                                  | no       |
 | `ingress_cidr_blocks`       | List of CIDR blocks for application HTTP ingress                     | list(string) | `["0.0.0.0/0"]`                                             | no       |
 | `ingress_cidr_ssh_blocks`   | List of CIDR blocks for SSH ingress                                  | list(string) | `["0.0.0.0/0"]`                                             | no       |
 | `ingress_tcp_ports`         | List of TCP ports to allow ingress traffic (minimum required: 443)   | list(number) | `[80, 443, 8883, 9092, 8446, 9093, 8123, 8543, 9000, 9004, 9090]` | no       |

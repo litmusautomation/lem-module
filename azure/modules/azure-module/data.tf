@@ -1,6 +1,6 @@
 locals {
   tags = {
-    Terrafrom   = "true"
+    Terraform   = "true"
     Environment = "dev"
     Product     = "Litmus Edge Manager"
     Application = var.image_version
