@@ -60,7 +60,6 @@ variable "resource_group_name" {
 variable "subnet_id" {
   type        = string
   description = "The name of the subnet to which the virtual machine will be connected."
-  default     = ""
 }
 
 variable "tags" {
@@ -72,7 +71,6 @@ variable "tags" {
 variable "virtual_network_name" {
   type        = string
   description = "The name of the virtual network where the VM will be deployed."
-  default     = ""
 }
 
 variable "vm_size" {
