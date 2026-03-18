@@ -15,6 +15,7 @@ module "edgemanager-azure" {
   image_version             = "${var.oem_name}-${var.app_version}"
   image_resource_group_name = var.image_resource_group_name
   custom_ssh_pub_key        = var.ssh_pub_key
+  ssh_enabled               = var.ssh_enabled
   custom_data               = data.cloudinit_config.config.rendered
 
   # optional parameters

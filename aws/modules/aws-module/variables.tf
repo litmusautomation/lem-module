@@ -27,7 +27,19 @@ variable "ingress_cidr_ssh_blocks" {
 
 variable "key_name" {
   type        = string
-  description = "The name of the SSH key pair used for VM access."
+  description = "The name of the SSH key pair used for VM access. Required when ssh_enabled = true."
+  default     = null
+}
+
+variable "ssh_enabled" {
+  type        = bool
+  description = "Enable SSH access to the virtual machine. When false, no key pair is attached and port 22 is not opened in the security group."
+  default     = false
+
+  validation {
+    condition     = !var.ssh_enabled
+    error_message = "SSH access is not supported on Edge Manager deployments. ssh_enabled must be false."
+  }
 }
 
 variable "name" {

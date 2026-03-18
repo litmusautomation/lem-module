@@ -4,7 +4,7 @@ module "edgemanager_vm" {
   name                        = var.name
   ami                         = data.aws_ami.em_ami.id
   instance_type               = var.vm_size
-  key_name                    = var.key_name
+  key_name                    = var.ssh_enabled ? var.key_name : null
   user_data                   = var.user_data
   user_data_replace_on_change = true
 

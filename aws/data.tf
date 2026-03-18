@@ -23,7 +23,7 @@ data "cloudinit_config" "config" {
   base64_encode = false
 
   dynamic "part" {
-    for_each = concat(local.cloudinit.default, local.cloudinit.set_ssh_key)
+    for_each = var.ssh_enabled ? concat(local.cloudinit.default, local.cloudinit.set_ssh_key) : local.cloudinit.default
     content {
       content    = part.value.content
       merge_type = "list(append)+dict(recurse_array)+str()"

@@ -33,8 +33,15 @@ variable "ingress_cidr_ssh_blocks" {
 }
 
 variable "key_name" {
-  description = "The name of the SSH key pair used for VM access."
+  description = "The name of the SSH key pair used for VM access. Required when ssh_enabled = true."
   type        = string
+  default     = null
+}
+
+variable "ssh_enabled" {
+  description = "Enable SSH access to the virtual machine. When false, no key pair is attached and port 22 is not opened."
+  type        = bool
+  default     = false
 }
 
 variable "name" {

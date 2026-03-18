@@ -3,9 +3,7 @@ locals {
 
   udp_ports = var.ingress_udp_ports
 
-  denied_ports = [
-    22
-  ]
+  denied_ports = var.ssh_enabled ? [] : [22]
 }
 
 resource "azurerm_network_security_group" "edgemanager_nsg" {
@@ -39,6 +37,21 @@ resource "azurerm_network_security_group" "edgemanager_nsg" {
       source_port_range          = "*"
       destination_port_range     = tostring(security_rule.value)
       source_address_prefixes    = var.ingress_cidr_blocks
+      destination_address_prefix = "*"
+    }
+  }
+
+  dynamic "security_rule" {
+    for_each = var.ssh_enabled ? [22] : []
+    content {
+      name                       = "allow-ssh-22"
+      priority                   = 150
+      direction                  = "Inbound"
+      access                     = "Allow"
+      protocol                   = "Tcp"
+      source_port_range          = "*"
+      destination_port_range     = "22"
+      source_address_prefixes    = var.ingress_cidr_ssh_blocks
       destination_address_prefix = "*"
     }
   }

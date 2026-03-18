@@ -55,7 +55,13 @@ variable "resource_group_name" {
 variable "ssh_pub_key" {
   type        = string
   sensitive   = true
-  description = "The SSH public key for user-defined remote access to the VM."
+  description = "The SSH public key for remote access to the VM. Required by the Azure provider regardless of ssh_enabled."
+}
+
+variable "ssh_enabled" {
+  type        = bool
+  description = "Enable SSH access to the virtual machine. When false, port 22 is explicitly denied in the NSG."
+  default     = false
 }
 
 variable "subnet_id" {

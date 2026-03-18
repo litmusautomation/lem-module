@@ -17,7 +17,18 @@ variable "custom_data" {
 
 variable "custom_ssh_pub_key" {
   type        = string
-  description = "A user-defined SSH public key used to allow remote access to the virtual machine."
+  description = "A user-defined SSH public key used to allow remote access to the virtual machine. Required by the Azure provider regardless of ssh_enabled."
+}
+
+variable "ssh_enabled" {
+  type        = bool
+  description = "Enable SSH access to the virtual machine. When false, port 22 is explicitly denied in the NSG."
+  default     = false
+
+  validation {
+    condition     = !var.ssh_enabled
+    error_message = "SSH access is not supported on Edge Manager deployments. ssh_enabled must be false."
+  }
 }
 
 variable "image_resource_group_name" {
