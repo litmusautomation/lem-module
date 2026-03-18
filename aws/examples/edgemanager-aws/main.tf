@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 module "edgemanager-example" {
-  source      = "git@github.com:litmusautomation/lem-module//aws?ref=main"
+  source      = "github.com/litmusautomation/lem-module//aws?ref=main"
   name        = var.name
   oem_name    = var.oem_name    # name of the edge manager
   app_version = var.app_version # version of the application
