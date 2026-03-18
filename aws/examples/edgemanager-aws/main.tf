@@ -12,4 +12,13 @@ module "edgemanager-example" {
   subnet_id   = var.subnet_id
   ami_owner   = var.ami_owner
   key_name    = var.key_name
+
+  # optional
+  admin_user_name         = var.admin_user_name
+  ssh_enabled             = var.ssh_enabled
+  ssh_pub_key             = var.ssh_pub_key
+  ingress_cidr_blocks     = var.ingress_cidr_blocks
+  ingress_cidr_ssh_blocks = var.ingress_cidr_ssh_blocks
+  ingress_tcp_ports       = var.ingress_tcp_ports
+  ingress_udp_ports       = var.ingress_udp_ports
 }
