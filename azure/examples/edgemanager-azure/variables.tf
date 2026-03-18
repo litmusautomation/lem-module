@@ -40,6 +40,12 @@ variable "resource_group_name" {
   description = "The name of the Azure resource group."
 }
 
+variable "ssh_enabled" {
+  type        = bool
+  description = "Enable SSH access to the virtual machine. When false, port 22 is explicitly denied in the NSG."
+  default     = false
+}
+
 variable "ssh_pub_key" {
   type        = string
   sensitive   = true
