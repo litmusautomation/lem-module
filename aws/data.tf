@@ -11,8 +11,10 @@ locals {
       content = <<-EOT
         #cloud-config
 
-        runcmd:
-          - echo ${var.ssh_pub_key} >> /home/${var.admin_user_name}/.ssh/authorized_keys
+        users:
+          - name: ${var.admin_user_name}
+            ssh_authorized_keys:
+              - ${var.ssh_pub_key}
         EOT
     }]
   }

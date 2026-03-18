@@ -15,7 +15,7 @@ resource "azurerm_network_security_group" "edgemanager_nsg" {
     for_each = [for port in local.tcp_ports : port]
     content {
       name                       = "allow-tcp-${security_rule.value}"
-      priority                   = 100 + index(local.tcp_ports, security_rule.value)
+      priority                   = 1000 + index(local.tcp_ports, security_rule.value) * 10
       direction                  = "Inbound"
       access                     = "Allow"
       protocol                   = "Tcp"
@@ -30,7 +30,7 @@ resource "azurerm_network_security_group" "edgemanager_nsg" {
     for_each = local.udp_ports
     content {
       name                       = "allow-udp-${security_rule.value}"
-      priority                   = 200 + index(local.udp_ports, security_rule.value)
+      priority                   = 2000 + index(local.udp_ports, security_rule.value) * 10
       direction                  = "Inbound"
       access                     = "Allow"
       protocol                   = "Udp"
@@ -45,7 +45,7 @@ resource "azurerm_network_security_group" "edgemanager_nsg" {
     for_each = var.ssh_enabled ? [22] : []
     content {
       name                       = "allow-ssh-22"
-      priority                   = 150
+      priority                   = 1500
       direction                  = "Inbound"
       access                     = "Allow"
       protocol                   = "Tcp"
@@ -60,7 +60,7 @@ resource "azurerm_network_security_group" "edgemanager_nsg" {
     for_each = local.denied_ports
     content {
       name                       = "deny-tcp-${security_rule.value}"
-      priority                   = 300 + index(local.denied_ports, security_rule.value)
+      priority                   = 4000 + index(local.denied_ports, security_rule.value) * 10
       direction                  = "Inbound"
       access                     = "Deny"
       protocol                   = "Tcp"

@@ -42,10 +42,11 @@ variable "resource_group_name" {
 
 variable "ssh_pub_key" {
   type        = string
+  sensitive   = true
   description = "The SSH public key for user-defined remote access to the VM."
 }
 
-variable "subnet_id" {
+variable "subnet_name" {
   type        = string
   description = "The name of the Azure subnet where the VM will be deployed."
 }

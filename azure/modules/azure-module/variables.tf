@@ -68,7 +68,7 @@ variable "resource_group_name" {
   description = "The name of the Azure resource group."
 }
 
-variable "subnet_id" {
+variable "subnet_name" {
   type        = string
   description = "The name of the subnet to which the virtual machine will be connected."
 }

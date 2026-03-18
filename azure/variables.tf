@@ -64,7 +64,7 @@ variable "ssh_enabled" {
   default     = false
 }
 
-variable "subnet_id" {
+variable "subnet_name" {
   type        = string
   description = "The name of the Azure subnet where the VM will be deployed."
 }
