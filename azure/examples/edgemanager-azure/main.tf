@@ -14,6 +14,7 @@ module "edgemanager-example" {
   virtual_network_name      = var.virtual_network_name
   subnet_name               = var.subnet_name
   image_resource_group_name = var.image_resource_group_name
+  admin_user_name           = var.admin_user_name
   ssh_enabled               = var.ssh_enabled
   ssh_pub_key               = var.ssh_pub_key
   subscription_id           = var.subscription_id
