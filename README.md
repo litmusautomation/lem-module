@@ -151,7 +151,7 @@ module "edgemanager-example" {
   location                  = "East US"
   resource_group_name       = "xxxxxxxxxxxxxxxxx"
   virtual_network_name      = "xxxxxxxxxxxxxxxxx"
-  subnet_id                 = "xxxxxxxxxxxxxxxxx" # subnet name
+  subnet_name               = "xxxxxxxxxxxxxxxxx"
   image_resource_group_name = "xxxxxxxxxxxxxxxxx"
   ssh_pub_key               = "ssh-rsa xxxxxxxxxxxxxxxxx user@host" # required custom ssh public key
 
@@ -174,7 +174,7 @@ module "edgemanager-example" {
 | `location`                  | Azure region where resources will be created                         | string       | n/a                                                         | yes      |
 | `resource_group_name`       | Name of the Azure resource group                                     | string       | n/a                                                         | yes      |
 | `virtual_network_name`      | Name of the virtual network for the instance                         | string       | n/a                                                         | yes      |
-| `subnet_id`                 | Subnet name where the instance will be deployed                      | string       | n/a                                                         | yes      |
+| `subnet_name`               | Subnet name where the instance will be deployed                      | string       | n/a                                                         | yes      |
 | `image_resource_group_name` | Name of the resource group hosting the image                         | string       | n/a                                                         | yes      |
 | `ssh_pub_key`               | SSH public key registered with the VM. Required by the Azure provider regardless of `ssh_enabled` | string | n/a                                                    | yes      |
 | `admin_user_name`           | Admin username created on the virtual machine                        | string       | `"ubuntu"`                                                           | no       |
