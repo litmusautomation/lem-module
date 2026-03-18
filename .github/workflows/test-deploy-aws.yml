@@ -2,6 +2,7 @@ name: Test LEM deployment | AWS
 
 env:
   AWS_REGION: "us-east-1"
+  TF_VAR_region: "us-east-1"
   TF_VAR_name: "edgemanager-${{ inputs.VERSION || '2.31.0' }}-github-workflow"
   TF_VAR_oem_name: "edgemanager"
   TF_VAR_app_version: ${{ inputs.VERSION || '2.31.0' }}

@@ -9,7 +9,5 @@ module "edgemanager-example" {
   app_version = var.app_version
   vpc_id      = var.vpc_id
   subnet_id   = var.subnet_id
-  key_name    = var.key_name
   ami_owner   = var.ami_owner
-  ssh_pub_key = var.ssh_pub_key
 }

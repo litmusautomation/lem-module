@@ -6,16 +6,10 @@ variable "app_version" {
 variable "region" {
   description = "The AWS region where resources will be deployed."
   type        = string
-  default     = "us-east-1"
 }
 
 variable "ami_owner" {
   description = "The AWS account ID that owns the AMI."
-  type        = string
-}
-
-variable "key_name" {
-  description = "The name of the SSH key pair used for VM access."
   type        = string
 }
 
@@ -28,12 +22,6 @@ variable "oem_name" {
   description = "The OEM name associated with the virtual machine."
   type        = string
   default     = "edgemanager"
-}
-
-variable "ssh_pub_key" {
-  description = "The user-defined public SSH key added to the virtual machine for access."
-  type        = string
-  default     = ""
 }
 
 variable "subnet_id" {

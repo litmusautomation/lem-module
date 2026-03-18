@@ -47,7 +47,7 @@ variable "ssh_pub_key" {
 
 variable "subnet_id" {
   type        = string
-  description = "The Azure subnet ID where the VM will be deployed."
+  description = "The name of the Azure subnet where the VM will be deployed."
 }
 
 variable "virtual_network_name" {

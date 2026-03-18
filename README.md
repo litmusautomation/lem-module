@@ -78,43 +78,41 @@ See [Edgemanager AWS example](https://github.com/litmusautomation/lem-module/blo
 
 ```
 module "edgemanager-example" {
-  source                  = "git@github.com:litmusautomation/lem-module//aws?ref=main"
-  name                    = "edgemanager-example-aws"
-  oem_name                = "edgemanager"
-  app_version             = "2.25.0"
-  vpc_id                  = "vpc-xxxxxxxxxxxxxxxxx"
-  subnet_id               = "subnet-xxxxxxxxxxxxxxxxx"
-  key_name                = "xxxxxxxxxxxxxxxxx"
-  ami_owner               = "xxxxxxxxxxxxxxxxx"
+  source      = "git@github.com:litmusautomation/lem-module//aws?ref=main"
+  name        = "edgemanager-example-aws"
+  app_version = "2.25.0"
+  region      = "us-east-1"
+  vpc_id      = "vpc-xxxxxxxxxxxxxxxxx"
+  subnet_id   = "subnet-xxxxxxxxxxxxxxxxx"
+  ami_owner   = "xxxxxxxxxxxxxxxxx"
 
   # Optional parameters
-  region                  = "us-west-2"
-  ssh_pub_key             = "ssh-rsa xxxxxxxxxxxxxxxxx user@host" # optional: injected via cloud-init
-  ingress_cidr_blocks     = ["0.0.0.0/0"]
-  ingress_tcp_ports       = [443, 8883, 9092]  # Customize TCP ports
-  ingress_udp_ports       = [51820]            # Customize UDP ports
+  ingress_cidr_blocks = ["0.0.0.0/0"]
+  ingress_tcp_ports   = [443, 8883, 9092]  # Customize TCP ports
+  ingress_udp_ports   = [51820]            # Customize UDP ports
 }
 
 ```
 
 #### Inputs
 
-| Name                      | Description                                                         | Type         | Default                                                     | Required |
-| ------------------------- | ------------------------------------------------------------------- | ------------ | ----------------------------------------------------------- | -------- |
-| `name`                    | Name assigned to resources                                          | string       | n/a                                                         | yes      |
-| `oem_name`                | OEM identifier for the deployment                                   | string       | `"edgemanager"`                                             | no       |
-| `app_version`             | Application version to deploy                                       | string       | n/a                                                         | yes      |
-| `vpc_id`                  | VPC ID where resources will be deployed                             | string       | n/a                                                         | yes      |
-| `subnet_id`               | Subnet ID for EC2 instances                                         | string       | n/a                                                         | yes      |
-| `key_name`                | Name of the AWS EC2 key pair                                        | string       | n/a                                                         | yes      |
-| `ami_owner`               | AWS account ID owning the AMI                                       | string       | n/a                                                         | yes      |
-| `region`                  | AWS region where resources will be deployed                         | string       | `us-east-1`                                                 | no       |
-| `admin_user_name`         | Admin username created on the virtual machine                       | string       | `"ubuntu"`                                                  | no       |
-| `ssh_pub_key`             | Custom SSH public key appended to the VM via cloud-init             | string       | `""`                                                        | no       |
-| `ingress_cidr_blocks`     | List of CIDR blocks for application HTTP ingress                    | list(string) | `["0.0.0.0/0"]`                                             | no       |
-| `ingress_cidr_ssh_blocks` | List of CIDR blocks for SSH ingress                                 | list(string) | `["0.0.0.0/0"]`                                             | no       |
-| `ingress_tcp_ports`       | List of TCP ports to allow ingress traffic (minimum required: 443)  | list(number) | `[80, 443, 8883, 9092, 8446, 9093, 8123, 8543, 9000, 9004, 9090]` | no       |
-| `ingress_udp_ports`       | List of UDP ports to allow ingress traffic (minimum required: 51820)| list(number) | `[51820, 123]`                                              | no       |
+| Name                      | Description                                                          | Type         | Default                                                              | Required |
+| ------------------------- | -------------------------------------------------------------------- | ------------ | -------------------------------------------------------------------- | -------- |
+| `name`                    | Name assigned to resources                                           | string       | n/a                                                                  | yes      |
+| `app_version`             | Application version to deploy                                        | string       | n/a                                                                  | yes      |
+| `region`                  | AWS region where resources will be deployed                          | string       | n/a                                                                  | yes      |
+| `vpc_id`                  | VPC ID where resources will be deployed                              | string       | n/a                                                                  | yes      |
+| `subnet_id`               | Subnet ID for EC2 instances                                          | string       | n/a                                                                  | yes      |
+| `ami_owner`               | AWS account ID owning the AMI                                        | string       | n/a                                                                  | yes      |
+| `oem_name`                | OEM identifier for the deployment                                    | string       | `"edgemanager"`                                                      | no       |
+| `admin_user_name`         | Admin username created on the virtual machine                        | string       | `"ubuntu"`                                                           | no       |
+| `ssh_enabled`             | Enable SSH access. When false, no key pair is attached and port 22 is not opened | bool | `false`                                                    | no       |
+| `key_name`                | Name of the AWS EC2 key pair. Required when `ssh_enabled = true`     | string       | `null`                                                               | no       |
+| `ssh_pub_key`             | SSH public key appended to the VM via cloud-init. Only used when `ssh_enabled = true` | string | `""`                                                    | no       |
+| `ingress_cidr_blocks`     | List of CIDR blocks for application ingress                          | list(string) | `["0.0.0.0/0"]`                                                      | no       |
+| `ingress_cidr_ssh_blocks` | List of CIDR blocks for SSH ingress. Only used when `ssh_enabled = true` | list(string) | `["0.0.0.0/0"]`                                              | no       |
+| `ingress_tcp_ports`       | List of TCP ports to allow ingress traffic (minimum required: 443)   | list(number) | `[80, 443, 8883, 9092, 8446, 9093, 8123, 8543, 9000, 9004, 9090]`   | no       |
+| `ingress_udp_ports`       | List of UDP ports to allow ingress traffic (minimum required: 51820) | list(number) | `[51820, 123]`                                                       | no       |
 
 #### Outputs
 
@@ -178,12 +176,13 @@ module "edgemanager-example" {
 | `virtual_network_name`      | Name of the virtual network for the instance                         | string       | n/a                                                         | yes      |
 | `subnet_id`                 | Subnet name where the instance will be deployed                      | string       | n/a                                                         | yes      |
 | `image_resource_group_name` | Name of the resource group hosting the image                         | string       | n/a                                                         | yes      |
-| `ssh_pub_key`               | Custom SSH public key for authentication                             | string       | n/a                                                         | yes      |
-| `admin_user_name`           | Admin username created on the virtual machine                        | string       | `"ubuntu"`                                                  | no       |
-| `ingress_cidr_blocks`       | List of CIDR blocks for application HTTP ingress                     | list(string) | `["0.0.0.0/0"]`                                             | no       |
-| `ingress_cidr_ssh_blocks`   | List of CIDR blocks for SSH ingress                                  | list(string) | `["0.0.0.0/0"]`                                             | no       |
-| `ingress_tcp_ports`         | List of TCP ports to allow ingress traffic (minimum required: 443)   | list(number) | `[80, 443, 8883, 9092, 8446, 9093, 8123, 8543, 9000, 9004, 9090]` | no       |
-| `ingress_udp_ports`         | List of UDP ports to allow ingress traffic (minimum required: 51820) | list(number) | `[51820, 123]`                                              | no       |
+| `ssh_pub_key`               | SSH public key registered with the VM. Required by the Azure provider regardless of `ssh_enabled` | string | n/a                                                    | yes      |
+| `admin_user_name`           | Admin username created on the virtual machine                        | string       | `"ubuntu"`                                                           | no       |
+| `ssh_enabled`               | Enable SSH access. When false, port 22 is explicitly denied in the NSG | bool       | `false`                                                              | no       |
+| `ingress_cidr_blocks`       | List of CIDR blocks for application ingress                          | list(string) | `["0.0.0.0/0"]`                                                      | no       |
+| `ingress_cidr_ssh_blocks`   | List of CIDR blocks for SSH ingress. Only used when `ssh_enabled = true` | list(string) | `["0.0.0.0/0"]`                                              | no       |
+| `ingress_tcp_ports`         | List of TCP ports to allow ingress traffic (minimum required: 443)   | list(number) | `[80, 443, 8883, 9092, 8446, 9093, 8123, 8543, 9000, 9004, 9090]`   | no       |
+| `ingress_udp_ports`         | List of UDP ports to allow ingress traffic (minimum required: 51820) | list(number) | `[51820, 123]`                                                       | no       |
 
 #### Outputs
 
