@@ -1,15 +1,3 @@
-variable "admin_user_name" {
-  type        = string
-  description = "The administrator username for the VM."
-  default     = "ubuntu"
-}
-
-variable "subscription_id" {
-  type        = string
-  description = "The Azure subscription ID where resources will be deployed."
-  sensitive   = true
-}
-
 variable "app_version" {
   type        = string
   description = "The version of Edgemanager to deploy."
@@ -18,18 +6,6 @@ variable "app_version" {
 variable "image_resource_group_name" {
   type        = string
   description = "The name of the resource group where the VM image is stored."
-}
-
-variable "ingress_cidr_blocks" {
-  description = "A list of CIDR blocks allowed to access the instance."
-  type        = list(string)
-  default     = ["0.0.0.0/0"]
-}
-
-variable "ingress_cidr_ssh_blocks" {
-  description = "A list of CIDR blocks allowed SSH access to the instance."
-  type        = list(string)
-  default     = ["0.0.0.0/0"]
 }
 
 variable "location" {
@@ -58,20 +34,40 @@ variable "ssh_pub_key" {
   description = "The SSH public key for remote access to the VM. Required by the Azure provider regardless of ssh_enabled."
 }
 
-variable "ssh_enabled" {
-  type        = bool
-  description = "Enable SSH access to the virtual machine. When false, port 22 is explicitly denied in the NSG."
-  default     = false
-}
-
 variable "subnet_name" {
   type        = string
   description = "The name of the Azure subnet where the VM will be deployed."
 }
 
+variable "subscription_id" {
+  type        = string
+  description = "The Azure subscription ID where resources will be deployed."
+  sensitive   = true
+}
+
 variable "virtual_network_name" {
   type        = string
   description = "The name of the Azure virtual network."
+}
+
+# -- Optional variables --
+
+variable "admin_user_name" {
+  type        = string
+  description = "The administrator username for the VM."
+  default     = "ubuntu"
+}
+
+variable "ingress_cidr_blocks" {
+  description = "A list of CIDR blocks allowed to access the instance."
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}
+
+variable "ingress_cidr_ssh_blocks" {
+  description = "A list of CIDR blocks allowed SSH access to the instance."
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
 }
 
 variable "ingress_tcp_ports" {
@@ -98,7 +94,6 @@ variable "ingress_tcp_ports" {
     condition     = alltrue([for port in var.ingress_tcp_ports : port >= 1 && port <= 65535])
     error_message = "All TCP ports must be between 1 and 65535."
   }
-
 }
 
 variable "ingress_udp_ports" {
@@ -115,5 +110,10 @@ variable "ingress_udp_ports" {
     condition     = alltrue([for port in var.ingress_udp_ports : port >= 1 && port <= 65535])
     error_message = "All UDP ports must be between 1 and 65535."
   }
+}
 
+variable "ssh_enabled" {
+  type        = bool
+  description = "Enable SSH access to the virtual machine. When false, port 22 is explicitly denied in the NSG."
+  default     = false
 }

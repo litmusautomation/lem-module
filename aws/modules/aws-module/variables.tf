@@ -13,6 +13,23 @@ variable "image_version" {
   description = "The version of the AMI image to use for deployment."
 }
 
+variable "name" {
+  type        = string
+  description = "A name applied to resources for easier identification."
+}
+
+variable "subnet_id" {
+  type        = string
+  description = "The ID of the target subnet in which the virtual machine will be deployed."
+}
+
+variable "vpc_id" {
+  type        = string
+  description = "The ID of the VPC in which the virtual machine will be deployed."
+}
+
+# -- Optional variables --
+
 variable "ingress_cidr_blocks" {
   type        = list(string)
   description = "A list of IPv4 CIDR ranges to be used for all ingress rules except SSH."
@@ -23,62 +40,6 @@ variable "ingress_cidr_ssh_blocks" {
   type        = list(string)
   description = "A list of CIDR blocks allowed to SSH into the virtual machine."
   default     = ["0.0.0.0/0"]
-}
-
-variable "key_name" {
-  type        = string
-  description = "The name of the SSH key pair used for VM access. Required when ssh_enabled = true."
-  default     = null
-}
-
-variable "ssh_enabled" {
-  type        = bool
-  description = "Enable SSH access to the virtual machine. When false, no key pair is attached and port 22 is not opened in the security group."
-  default     = false
-
-  validation {
-    condition     = !var.ssh_enabled
-    error_message = "SSH access is not supported on Edge Manager deployments. ssh_enabled must be false."
-  }
-}
-
-variable "name" {
-  type        = string
-  description = "A name applied to resources for easier identification."
-}
-
-variable "private_ip" {
-  type        = string
-  description = "A dedicated, preassigned private IP to be used by the virtual machine."
-  default     = null
-}
-
-variable "subnet_id" {
-  type        = string
-  description = "The ID of the target subnet in which the virtual machine will be deployed."
-}
-
-variable "tags" {
-  type        = map(string)
-  description = "A map of tags to apply to resources."
-  default     = {}
-}
-
-variable "user_data" {
-  type        = string
-  description = "User defined custom data."
-  default     = ""
-}
-
-variable "vm_size" {
-  type        = string
-  description = "The instance type (VM size) to be used for deployment."
-  default     = "t3.xlarge"
-}
-
-variable "vpc_id" {
-  type        = string
-  description = "The ID of the VPC in which the virtual machine will be deployed."
 }
 
 variable "ingress_tcp_ports" {
@@ -121,4 +82,45 @@ variable "ingress_udp_ports" {
     condition     = alltrue([for port in var.ingress_udp_ports : port >= 1 && port <= 65535])
     error_message = "All UDP ports must be between 1 and 65535."
   }
+}
+
+variable "key_name" {
+  type        = string
+  description = "The name of the SSH key pair used for VM access. Required when ssh_enabled = true."
+  default     = null
+}
+
+variable "private_ip" {
+  type        = string
+  description = "A dedicated, preassigned private IP to be used by the virtual machine."
+  default     = null
+}
+
+variable "ssh_enabled" {
+  type        = bool
+  description = "Enable SSH access to the virtual machine. When false, no key pair is attached and port 22 is not opened in the security group."
+  default     = false
+
+  validation {
+    condition     = !var.ssh_enabled
+    error_message = "SSH access is not supported on Edge Manager deployments. ssh_enabled must be false."
+  }
+}
+
+variable "tags" {
+  type        = map(string)
+  description = "A map of tags to apply to resources."
+  default     = {}
+}
+
+variable "user_data" {
+  type        = string
+  description = "User defined custom data."
+  default     = ""
+}
+
+variable "vm_size" {
+  type        = string
+  description = "The instance type (VM size) to be used for deployment."
+  default     = "t3.xlarge"
 }

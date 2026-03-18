@@ -1,34 +1,11 @@
-variable "address_allocation" {
-  type        = string
-  description = "The method of IP address allocation for the VM (e.g., Dynamic or Static)."
-  default     = "Dynamic"
-}
-
 variable "admin_user_name" {
   type        = string
   description = "The administrator username for the virtual machine."
 }
 
-variable "custom_data" {
-  type        = string
-  description = "User defined custom data."
-  default     = ""
-}
-
 variable "custom_ssh_pub_key" {
   type        = string
   description = "A user-defined SSH public key used to allow remote access to the virtual machine. Required by the Azure provider regardless of ssh_enabled."
-}
-
-variable "ssh_enabled" {
-  type        = bool
-  description = "Enable SSH access to the virtual machine. When false, port 22 is explicitly denied in the NSG."
-  default     = false
-
-  validation {
-    condition     = !var.ssh_enabled
-    error_message = "SSH access is not supported on Edge Manager deployments. ssh_enabled must be false."
-  }
 }
 
 variable "image_resource_group_name" {
@@ -39,18 +16,6 @@ variable "image_resource_group_name" {
 variable "image_version" {
   type        = string
   description = "The version of the image to use for the virtual machine."
-}
-
-variable "ingress_cidr_blocks" {
-  type        = list(string)
-  description = "A list of IPv4 CIDR ranges to be used for all ingress rules except SSH."
-  default     = ["0.0.0.0/0"]
-}
-
-variable "ingress_cidr_ssh_blocks" {
-  type        = list(string)
-  description = "A list of CIDR blocks allowed to SSH into the virtual machine."
-  default     = ["0.0.0.0/0"]
 }
 
 variable "location" {
@@ -73,21 +38,35 @@ variable "subnet_name" {
   description = "The name of the subnet to which the virtual machine will be connected."
 }
 
-variable "tags" {
-  type        = map(string)
-  description = "A map of tags to apply to resources."
-  default     = {}
-}
-
 variable "virtual_network_name" {
   type        = string
   description = "The name of the virtual network where the VM will be deployed."
 }
 
-variable "vm_size" {
+# -- Optional variables --
+
+variable "address_allocation" {
   type        = string
-  description = "The size of the virtual machine instance."
-  default     = "Standard_B4ms"
+  description = "The method of IP address allocation for the VM (e.g., Dynamic or Static)."
+  default     = "Dynamic"
+}
+
+variable "custom_data" {
+  type        = string
+  description = "User defined custom data."
+  default     = ""
+}
+
+variable "ingress_cidr_blocks" {
+  type        = list(string)
+  description = "A list of IPv4 CIDR ranges to be used for all ingress rules except SSH."
+  default     = ["0.0.0.0/0"]
+}
+
+variable "ingress_cidr_ssh_blocks" {
+  type        = list(string)
+  description = "A list of CIDR blocks allowed to SSH into the virtual machine."
+  default     = ["0.0.0.0/0"]
 }
 
 variable "ingress_tcp_ports" {
@@ -130,4 +109,27 @@ variable "ingress_udp_ports" {
     condition     = alltrue([for port in var.ingress_udp_ports : port >= 1 && port <= 65535])
     error_message = "All UDP ports must be between 1 and 65535."
   }
+}
+
+variable "ssh_enabled" {
+  type        = bool
+  description = "Enable SSH access to the virtual machine. When false, port 22 is explicitly denied in the NSG."
+  default     = false
+
+  validation {
+    condition     = !var.ssh_enabled
+    error_message = "SSH access is not supported on Edge Manager deployments. ssh_enabled must be false."
+  }
+}
+
+variable "tags" {
+  type        = map(string)
+  description = "A map of tags to apply to resources."
+  default     = {}
+}
+
+variable "vm_size" {
+  type        = string
+  description = "The size of the virtual machine instance."
+  default     = "Standard_B4ms"
 }
