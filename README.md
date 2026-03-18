@@ -2,10 +2,73 @@
 
 #### About
 
-- Modules deploy a virtual machine (VM) in a private subnet, ensuring isolation from the public network.
-- Do not assign a public IP to the instance, enhancing security by restricting direct internet access.
-- Modules assign a private IP to the instance, allowing communication within the VPC/VNet while maintaining internal networking.
-- SSH access is disabled by default, reinforcing security by preventing unauthorized remote access.
+These modules deploy the Litmus Edge Manager application on a virtual machine in either AWS or Azure. Both modules share the same security posture and configuration model:
+
+- VM is deployed in a **private subnet** — no public IP is assigned
+- Private IP only, with all communication staying within the VPC/VNet
+- **SSH is permanently disabled** — this is enforced by the inner module and cannot be overridden via input variables
+- Port access is fully configurable within defined constraints (see [Port Configuration](#port-configuration))
+
+#### Security Model
+
+**What is locked and cannot be changed:**
+- SSH (port 22) is hard-locked off at the module level. Setting `ssh_enabled = true` will cause a Terraform validation error. This is by design — SSH access is not supported on Edge Manager deployments.
+- Port 22 cannot be added to `ingress_tcp_ports` — a validation rule rejects it explicitly.
+- Port 443 (HTTPS) must always be present in `ingress_tcp_ports` — it is required for Edge Manager functionality.
+- Port 51820 (WireGuard VPN) must always be present in `ingress_udp_ports` — it is required for Edge Manager connectivity.
+
+**What you can configure:**
+- Which TCP and UDP ports are opened (within the constraints above)
+- Which IP ranges (CIDR blocks) can access those ports
+- The admin username on the VM
+- The VM size/instance type
+- SSH key material (Azure always requires it; AWS only uses it if you configure cloud-init separately)
+
+#### Port Configuration
+
+Default TCP ports opened by the module:
+
+| Port | Protocol | Purpose |
+| ---- | -------- | ------- |
+| 80   | TCP      | HTTP |
+| 443  | TCP      | HTTPS — **required, cannot be removed** |
+| 8446 | TCP      | HTTPS alternate |
+| 8883 | TCP      | MQTT (IoT messaging) |
+| 9092 | TCP      | Kafka (data streaming) |
+| 9093 | TCP      | Kafka TLS |
+| 8123 | TCP      | ClickHouse HTTP interface |
+| 8543 | TCP      | ClickHouse HTTPS interface |
+| 9000 | TCP      | ClickHouse native protocol |
+| 9004 | TCP      | ClickHouse MySQL interface |
+| 9090 | TCP      | Prometheus metrics |
+
+Default UDP ports opened by the module:
+
+| Port  | Protocol | Purpose |
+| ----- | -------- | ------- |
+| 51820 | UDP      | WireGuard VPN — **required, cannot be removed** |
+| 123   | UDP      | NTP (time synchronization) |
+
+**Customizing ports:**
+
+You can replace the default port lists entirely by providing your own. Constraints that are always enforced:
+- Port 22 must not be included in `ingress_tcp_ports`
+- Port 443 must be included in `ingress_tcp_ports`
+- Port 51820 must be included in `ingress_udp_ports`
+- All ports must be in the range 1–65535
+
+Example — minimal port configuration:
+```hcl
+ingress_tcp_ports = [443, 8883, 9092]   # only open what you need
+ingress_udp_ports = [51820]             # only WireGuard required
+```
+
+**CIDR restrictions:**
+
+By default, `ingress_cidr_blocks` is set to `["0.0.0.0/0"]` (open to all). In production, always restrict this to your organization's IP ranges:
+```hcl
+ingress_cidr_blocks = ["10.0.0.0/8", "192.168.1.0/24"]
+```
 
 #### State Management Configuration
 
@@ -46,6 +109,8 @@ terraform {
 - Use remote backends (S3, Azure Storage) for team collaboration and state locking
 - The `.auto.tfvars` extension ensures automatic loading without explicit `-var-file` flag
 
+---
+
 ### Deploying Edgemanager on AWS
 
 #### Requirements
@@ -53,66 +118,71 @@ terraform {
 - Terraform >= v1.5.7
 - AWS access configured
 
-#### Security
+#### Minimal Example
 
-**SSH Access:**
-- SSH (port 22) is **explicitly disabled** for security reasons
-- Attempting to include port 22 in `ingress_tcp_ports` will result in a validation error
-- Azure deployments have an explicit deny rule for SSH traffic
-- AWS deployments omit SSH from security group rules
+Required parameters only — uses all module defaults for ports, CIDR blocks, and VM size.
 
-**Network Security Best Practices:**
-- Always restrict `ingress_cidr_blocks` to your organization's IP ranges
-- Never use `0.0.0.0/0` in production environments
-- Use minimal port configuration for reduced attack surface
-- Minimum required ports: **443/tcp** (HTTPS) and **51820/udp** (WireGuard VPN)
-
-**Port Configuration:**
-- All port variables include validation to ensure required ports are present
-- Port 22 is automatically rejected if specified
-- Valid port range: 1-65535
-
-#### Usage
-
-See [Edgemanager AWS example](https://github.com/litmusautomation/lem-module/blob/main/aws/examples/edgemanager-aws/main.tf)
-
-```
-module "edgemanager-example" {
+```hcl
+module "edgemanager" {
   source      = "git@github.com:litmusautomation/lem-module//aws?ref=main"
-  name        = "edgemanager-example-aws"
+  name        = "edgemanager-prod"
   app_version = "2.25.0"
   region      = "us-east-1"
   vpc_id      = "vpc-xxxxxxxxxxxxxxxxx"
   subnet_id   = "subnet-xxxxxxxxxxxxxxxxx"
-  ami_owner   = "xxxxxxxxxxxxxxxxx"
-
-  # Optional parameters
-  ingress_cidr_blocks = ["0.0.0.0/0"]
-  ingress_tcp_ports   = [443, 8883, 9092]  # Customize TCP ports
-  ingress_udp_ports   = [51820]            # Customize UDP ports
+  ami_owner   = "123456789012"
+  key_name    = "my-ec2-keypair"
 }
+```
 
+#### Full Example
+
+All available parameters shown with example values. Parameters marked `# optional` have defaults and can be omitted.
+
+See [Edgemanager AWS example](https://github.com/litmusautomation/lem-module/blob/main/aws/examples/edgemanager-aws/main.tf)
+
+```hcl
+module "edgemanager" {
+  source      = "git@github.com:litmusautomation/lem-module//aws?ref=main"
+  name        = "edgemanager-prod"
+  app_version = "2.25.0"
+  region      = "us-east-1"
+  vpc_id      = "vpc-xxxxxxxxxxxxxxxxx"
+  subnet_id   = "subnet-xxxxxxxxxxxxxxxxx"
+  ami_owner   = "123456789012"
+  key_name    = "my-ec2-keypair"
+
+  # optional
+  oem_name                = "edgemanager"
+  admin_user_name         = "ubuntu"
+  ssh_enabled             = false                    # must remain false — SSH is not supported
+  ssh_pub_key             = "ssh-rsa AAAA... user@host"
+  ingress_cidr_blocks     = ["10.0.0.0/8"]          # restrict to your network in production
+  ingress_cidr_ssh_blocks = ["10.0.0.0/8"]
+  ingress_tcp_ports       = [443, 8883, 9092]        # customize to only ports you need
+  ingress_udp_ports       = [51820]                  # customize to only ports you need
+}
 ```
 
 #### Inputs
 
-| Name                      | Description                                                          | Type         | Default                                                              | Required |
-| ------------------------- | -------------------------------------------------------------------- | ------------ | -------------------------------------------------------------------- | -------- |
-| `name`                    | Name assigned to resources                                           | string       | n/a                                                                  | yes      |
-| `app_version`             | Application version to deploy                                        | string       | n/a                                                                  | yes      |
-| `region`                  | AWS region where resources will be deployed                          | string       | n/a                                                                  | yes      |
-| `vpc_id`                  | VPC ID where resources will be deployed                              | string       | n/a                                                                  | yes      |
-| `subnet_id`               | Subnet ID for EC2 instances                                          | string       | n/a                                                                  | yes      |
-| `ami_owner`               | AWS account ID owning the AMI                                        | string       | n/a                                                                  | yes      |
-| `oem_name`                | OEM identifier for the deployment                                    | string       | `"edgemanager"`                                                      | no       |
-| `admin_user_name`         | Admin username created on the virtual machine                        | string       | `"ubuntu"`                                                           | no       |
-| `ssh_enabled`             | Enable SSH access. When false, no key pair is attached and port 22 is not opened | bool | `false`                                                    | no       |
-| `key_name`                | Name of the AWS EC2 key pair. Required when `ssh_enabled = true`     | string       | `null`                                                               | no       |
-| `ssh_pub_key`             | SSH public key appended to the VM via cloud-init. Only used when `ssh_enabled = true` | string | `""`                                                    | no       |
-| `ingress_cidr_blocks`     | List of CIDR blocks for application ingress                          | list(string) | `["0.0.0.0/0"]`                                                      | no       |
-| `ingress_cidr_ssh_blocks` | List of CIDR blocks for SSH ingress. Only used when `ssh_enabled = true` | list(string) | `["0.0.0.0/0"]`                                              | no       |
-| `ingress_tcp_ports`       | List of TCP ports to allow ingress traffic (minimum required: 443)   | list(number) | `[80, 443, 8883, 9092, 8446, 9093, 8123, 8543, 9000, 9004, 9090]`   | no       |
-| `ingress_udp_ports`       | List of UDP ports to allow ingress traffic (minimum required: 51820) | list(number) | `[51820, 123]`                                                       | no       |
+| Name                      | Description                                                                               | Type         | Default                                                            | Required |
+| ------------------------- | ----------------------------------------------------------------------------------------- | ------------ | ------------------------------------------------------------------ | -------- |
+| `name`                    | Name assigned to resources                                                                | string       | n/a                                                                | yes      |
+| `app_version`             | Application version to deploy                                                             | string       | n/a                                                                | yes      |
+| `region`                  | AWS region where resources will be deployed                                               | string       | n/a                                                                | yes      |
+| `vpc_id`                  | VPC ID where resources will be deployed                                                   | string       | n/a                                                                | yes      |
+| `subnet_id`               | Subnet ID for EC2 instances                                                               | string       | n/a                                                                | yes      |
+| `ami_owner`               | AWS account ID owning the AMI                                                             | string       | n/a                                                                | yes      |
+| `key_name`                | Name of the AWS EC2 key pair. Stored with the VM for future use                          | string       | n/a                                                                | yes      |
+| `oem_name`                | OEM identifier for the deployment                                                         | string       | `"edgemanager"`                                                    | no       |
+| `admin_user_name`         | Admin username created on the virtual machine                                             | string       | `"ubuntu"`                                                         | no       |
+| `ssh_enabled`             | Must remain `false`. SSH is not supported on Edge Manager deployments                     | bool         | `false`                                                            | no       |
+| `ssh_pub_key`             | SSH public key injected into the VM via cloud-init                                       | string       | `""`                                                               | no       |
+| `ingress_cidr_blocks`     | CIDR blocks for application ingress. Restrict to your org's IP ranges in production      | list(string) | `["0.0.0.0/0"]`                                                    | no       |
+| `ingress_cidr_ssh_blocks` | CIDR blocks for SSH ingress (reserved for future use when SSH is enabled)                 | list(string) | `["0.0.0.0/0"]`                                                    | no       |
+| `ingress_tcp_ports`       | TCP ports to open. Must include 443. Must not include 22. See [Port Configuration](#port-configuration) | list(number) | `[80, 443, 8883, 9092, 8446, 9093, 8123, 8543, 9000, 9004, 9090]` | no       |
+| `ingress_udp_ports`       | UDP ports to open. Must include 51820. See [Port Configuration](#port-configuration)     | list(number) | `[51820, 123]`                                                     | no       |
 
 #### Outputs
 
@@ -123,12 +193,14 @@ module "edgemanager-example" {
 | APP_HTTPS_URL       | Edgemanager application https URL       |
 | ADMIN_APP_HTTPS_URL | Edgemanager Admin application https URL |
 
+---
+
 ### Deploying Edgemanager on Azure
 
 #### Requirements
 
 - Terraform >= v1.5.7
-- Azure access configured with the following
+- Azure access configured with the following environment variables
 
 | Name                | Description                                                                           |
 | ------------------- | ------------------------------------------------------------------------------------- |
@@ -137,52 +209,78 @@ module "edgemanager-example" {
 | ARM_SUBSCRIPTION_ID | The **Azure subscription ID** where Terraform will create and manage resources.       |
 | ARM_TENANT_ID       | The **Azure tenant ID** linked to the subscription and service principal.             |
 
-#### Usage
+#### Minimal Example
 
-See [Edgemanager Azure example](https://github.com/litmusautomation/lem-module/blob/main/azure/examples/edgemanager-azure/main.tf)
+Required parameters only — uses all module defaults for ports, CIDR blocks, and VM size.
 
-```
-module "edgemanager-example" {
+> **Note:** `ssh_pub_key` is always required by the Azure provider to configure the VM, even when SSH access is disabled.
+
+```hcl
+module "edgemanager" {
   source                    = "git@github.com:litmusautomation/lem-module//azure?ref=main"
-  name                      = "edgemanager-example-azure"
+  name                      = "edgemanager-prod"
   oem_name                  = "edgemanager"
   app_version               = "2.25.0"
   subscription_id           = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
   location                  = "East US"
-  resource_group_name       = "xxxxxxxxxxxxxxxxx"
-  virtual_network_name      = "xxxxxxxxxxxxxxxxx"
-  subnet_name               = "xxxxxxxxxxxxxxxxx"
-  image_resource_group_name = "xxxxxxxxxxxxxxxxx"
-  ssh_pub_key               = "ssh-rsa xxxxxxxxxxxxxxxxx user@host" # required custom ssh public key
-
-  # Optional parameters
-  ingress_cidr_blocks     = ["0.0.0.0/0"]
-  ingress_tcp_ports       = [443, 8883, 9092]  # Customize TCP ports
-  ingress_udp_ports       = [51820]            # Customize UDP ports
+  resource_group_name       = "my-resource-group"
+  virtual_network_name      = "my-vnet"
+  subnet_name               = "my-subnet"
+  image_resource_group_name = "my-image-resource-group"
+  ssh_pub_key               = "ssh-rsa AAAA... user@host"
 }
+```
 
+#### Full Example
+
+All available parameters shown with example values. Parameters marked `# optional` have defaults and can be omitted.
+
+See [Edgemanager Azure example](https://github.com/litmusautomation/lem-module/blob/main/azure/examples/edgemanager-azure/main.tf)
+
+```hcl
+module "edgemanager" {
+  source                    = "git@github.com:litmusautomation/lem-module//azure?ref=main"
+  name                      = "edgemanager-prod"
+  oem_name                  = "edgemanager"
+  app_version               = "2.25.0"
+  subscription_id           = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+  location                  = "East US"
+  resource_group_name       = "my-resource-group"
+  virtual_network_name      = "my-vnet"
+  subnet_name               = "my-subnet"
+  image_resource_group_name = "my-image-resource-group"
+  ssh_pub_key               = "ssh-rsa AAAA... user@host"  # required by Azure provider
+
+  # optional
+  admin_user_name         = "ubuntu"
+  ssh_enabled             = false                    # must remain false — SSH is not supported
+  ingress_cidr_blocks     = ["10.0.0.0/8"]          # restrict to your network in production
+  ingress_cidr_ssh_blocks = ["10.0.0.0/8"]
+  ingress_tcp_ports       = [443, 8883, 9092]        # customize to only ports you need
+  ingress_udp_ports       = [51820]                  # customize to only ports you need
+}
 ```
 
 #### Inputs
 
-| Name                        | Description                                                          | Type         | Default                                                     | Required |
-| --------------------------- | -------------------------------------------------------------------- | ------------ | ----------------------------------------------------------- | -------- |
-| `name`                      | Name assigned to resources                                           | string       | n/a                                                         | yes      |
-| `oem_name`                  | OEM identifier for the deployment                                    | string       | n/a                                                         | yes      |
-| `app_version`               | Application version to deploy                                        | string       | n/a                                                         | yes      |
-| `subscription_id`           | Azure subscription ID where resources will be deployed (sensitive)   | string       | n/a                                                         | yes      |
-| `location`                  | Azure region where resources will be created                         | string       | n/a                                                         | yes      |
-| `resource_group_name`       | Name of the Azure resource group                                     | string       | n/a                                                         | yes      |
-| `virtual_network_name`      | Name of the virtual network for the instance                         | string       | n/a                                                         | yes      |
-| `subnet_name`               | Subnet name where the instance will be deployed                      | string       | n/a                                                         | yes      |
-| `image_resource_group_name` | Name of the resource group hosting the image                         | string       | n/a                                                         | yes      |
-| `ssh_pub_key`               | SSH public key registered with the VM. Required by the Azure provider regardless of `ssh_enabled` | string | n/a                                                    | yes      |
-| `admin_user_name`           | Admin username created on the virtual machine                        | string       | `"ubuntu"`                                                           | no       |
-| `ssh_enabled`               | Enable SSH access. When false, port 22 is explicitly denied in the NSG | bool       | `false`                                                              | no       |
-| `ingress_cidr_blocks`       | List of CIDR blocks for application ingress                          | list(string) | `["0.0.0.0/0"]`                                                      | no       |
-| `ingress_cidr_ssh_blocks`   | List of CIDR blocks for SSH ingress. Only used when `ssh_enabled = true` | list(string) | `["0.0.0.0/0"]`                                              | no       |
-| `ingress_tcp_ports`         | List of TCP ports to allow ingress traffic (minimum required: 443)   | list(number) | `[80, 443, 8883, 9092, 8446, 9093, 8123, 8543, 9000, 9004, 9090]`   | no       |
-| `ingress_udp_ports`         | List of UDP ports to allow ingress traffic (minimum required: 51820) | list(number) | `[51820, 123]`                                                       | no       |
+| Name                        | Description                                                                               | Type         | Default                                                            | Required |
+| --------------------------- | ----------------------------------------------------------------------------------------- | ------------ | ------------------------------------------------------------------ | -------- |
+| `name`                      | Name assigned to resources                                                                | string       | n/a                                                                | yes      |
+| `oem_name`                  | OEM identifier for the deployment                                                         | string       | n/a                                                                | yes      |
+| `app_version`               | Application version to deploy                                                             | string       | n/a                                                                | yes      |
+| `subscription_id`           | Azure subscription ID where resources will be deployed (sensitive)                        | string       | n/a                                                                | yes      |
+| `location`                  | Azure region where resources will be created                                              | string       | n/a                                                                | yes      |
+| `resource_group_name`       | Name of the Azure resource group                                                          | string       | n/a                                                                | yes      |
+| `virtual_network_name`      | Name of the virtual network for the instance                                              | string       | n/a                                                                | yes      |
+| `subnet_name`               | Name of the subnet where the instance will be deployed                                    | string       | n/a                                                                | yes      |
+| `image_resource_group_name` | Name of the resource group hosting the VM image                                           | string       | n/a                                                                | yes      |
+| `ssh_pub_key`               | SSH public key registered with the VM. Required by the Azure provider regardless of `ssh_enabled` | string | n/a                                                          | yes      |
+| `admin_user_name`           | Admin username created on the virtual machine                                             | string       | `"ubuntu"`                                                         | no       |
+| `ssh_enabled`               | Must remain `false`. SSH is not supported on Edge Manager deployments                     | bool         | `false`                                                            | no       |
+| `ingress_cidr_blocks`       | CIDR blocks for application ingress. Restrict to your org's IP ranges in production      | list(string) | `["0.0.0.0/0"]`                                                    | no       |
+| `ingress_cidr_ssh_blocks`   | CIDR blocks for SSH ingress (reserved for future use when SSH is enabled)                 | list(string) | `["0.0.0.0/0"]`                                                    | no       |
+| `ingress_tcp_ports`         | TCP ports to open. Must include 443. Must not include 22. See [Port Configuration](#port-configuration) | list(number) | `[80, 443, 8883, 9092, 8446, 9093, 8123, 8543, 9000, 9004, 9090]` | no       |
+| `ingress_udp_ports`         | UDP ports to open. Must include 51820. See [Port Configuration](#port-configuration)     | list(number) | `[51820, 123]`                                                     | no       |
 
 #### Outputs
 
@@ -192,6 +290,8 @@ module "edgemanager-example" {
 | PRIVATE_IP          | Private IP of the VM                    |
 | APP_HTTPS_URL       | Edgemanager application https URL       |
 | ADMIN_APP_HTTPS_URL | Edgemanager Admin application https URL |
+
+---
 
 ## License
 
