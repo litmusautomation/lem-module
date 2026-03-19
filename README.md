@@ -24,6 +24,8 @@ These modules deploy the Litmus Edge Manager application on a virtual machine in
 - The VM size/instance type
 - SSH key material (Azure always requires it; AWS only uses it if you configure cloud-init separately)
 
+> **Note on SSH-related optional parameters:** `ssh_enabled`, `ssh_pub_key`, and `ingress_cidr_ssh_blocks` are exposed as optional parameters but will have no functional effect — SSH access is permanently disabled at the module level and cannot be activated through input variables.
+
 #### Port Configuration
 
 Default TCP ports opened by the module:
