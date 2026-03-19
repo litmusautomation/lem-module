@@ -123,7 +123,7 @@ Required parameters only — uses all module defaults for ports, CIDR blocks, an
 
 ```hcl
 module "edgemanager" {
-  source      = "git@github.com:litmusautomation/lem-module//aws?ref=main"
+  source      = "github.com/litmusautomation/lem-module//aws?ref=main"
   name        = "edgemanager-prod"
   app_version = "2.25.0"
   region      = "us-east-1"
@@ -141,7 +141,7 @@ See [Edgemanager AWS example](https://github.com/litmusautomation/lem-module/blo
 
 ```hcl
 module "edgemanager" {
-  source      = "git@github.com:litmusautomation/lem-module//aws?ref=main"
+  source      = "github.com/litmusautomation/lem-module//aws?ref=main"
   name        = "edgemanager-prod"
   app_version = "2.25.0"
   region      = "us-east-1"
@@ -213,7 +213,7 @@ Required parameters only — uses all module defaults for ports, CIDR blocks, an
 
 ```hcl
 module "edgemanager" {
-  source                    = "git@github.com:litmusautomation/lem-module//azure?ref=main"
+  source                    = "github.com/litmusautomation/lem-module//azure?ref=main"
   name                      = "edgemanager-prod"
   oem_name                  = "edgemanager"
   app_version               = "2.25.0"
@@ -235,7 +235,7 @@ See [Edgemanager Azure example](https://github.com/litmusautomation/lem-module/b
 
 ```hcl
 module "edgemanager" {
-  source                    = "git@github.com:litmusautomation/lem-module//azure?ref=main"
+  source                    = "github.com/litmusautomation/lem-module//azure?ref=main"
   name                      = "edgemanager-prod"
   oem_name                  = "edgemanager"
   app_version               = "2.25.0"
