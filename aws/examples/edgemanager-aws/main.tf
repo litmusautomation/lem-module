@@ -3,13 +3,22 @@ provider "aws" {
 }
 
 module "edgemanager-example" {
-  source      = "github.com/litmusautomation/lem-module//aws?ref=main"
+  source      = "github.com/litmusautomation/lem-module//aws?ref=LIT-5811-code-improvements"
   name        = var.name
-  oem_name    = var.oem_name    # name of the edge manager
-  app_version = var.app_version # version of the application
-  vpc_id      = var.vpc_id      # vpc id
-  subnet_id   = var.subnet_id   # subnet id
-  key_name    = var.key_name    # key pair name
-  ami_owner   = var.ami_owner   # aws account id
-  ssh_pub_key = var.ssh_pub_key # optional custom ssh public key
+  oem_name    = var.oem_name
+  app_version = var.app_version
+  region      = var.region
+  vpc_id      = var.vpc_id
+  subnet_id   = var.subnet_id
+  ami_owner   = var.ami_owner
+  key_name    = var.key_name
+
+  # optional
+  admin_user_name         = var.admin_user_name
+  ssh_enabled             = var.ssh_enabled
+  ssh_pub_key             = var.ssh_pub_key
+  ingress_cidr_blocks     = var.ingress_cidr_blocks
+  ingress_cidr_ssh_blocks = var.ingress_cidr_ssh_blocks
+  ingress_tcp_ports       = var.ingress_tcp_ports
+  ingress_udp_ports       = var.ingress_udp_ports
 }

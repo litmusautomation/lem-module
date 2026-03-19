@@ -45,7 +45,7 @@ jobs:
       TF_VAR_location: "East US"
       TF_VAR_resource_group_name: ${{ secrets.RESOURCE_GROUP_NAME }}
       TF_VAR_virtual_network_name: ${{ secrets.VNET_NAME }}
-      TF_VAR_subnet_id: ${{ secrets.SUBNET_NAME }}
+      TF_VAR_subnet_name: ${{ secrets.SUBNET_NAME }}
       TF_VAR_image_resource_group_name: ${{ secrets.IMAGE_RESOURCE_GROUP_NAME }}
 
     steps:
@@ -69,6 +69,9 @@ jobs:
       - name: tf-init
         run: terraform init
 
+      - name: tf-validate
+        run: terraform validate
+
       - name: tf-plan
         id: plan
         run: terraform plan
@@ -90,7 +93,7 @@ jobs:
       TF_VAR_location: "East US"
       TF_VAR_resource_group_name: ${{ secrets.RESOURCE_GROUP_NAME }}
       TF_VAR_virtual_network_name: ${{ secrets.VNET_NAME }}
-      TF_VAR_subnet_id: ${{ secrets.SUBNET_NAME }}
+      TF_VAR_subnet_name: ${{ secrets.SUBNET_NAME }}
       TF_VAR_image_resource_group_name: ${{ secrets.IMAGE_RESOURCE_GROUP_NAME }}
 
     steps:
@@ -135,7 +138,7 @@ jobs:
       TF_VAR_location: "East US"
       TF_VAR_resource_group_name: ${{ secrets.RESOURCE_GROUP_NAME }}
       TF_VAR_virtual_network_name: ${{ secrets.VNET_NAME }}
-      TF_VAR_subnet_id: ${{ secrets.SUBNET_NAME }}
+      TF_VAR_subnet_name: ${{ secrets.SUBNET_NAME }}
       TF_VAR_image_resource_group_name: ${{ secrets.IMAGE_RESOURCE_GROUP_NAME }}
 
     steps:

@@ -1,13 +1,6 @@
-variable "admin_user_name" {
-  description = "The admin user account to be created on the virtual machine."
+variable "ami_owner" {
+  description = "The AWS account ID that owns the AMI."
   type        = string
-  default     = "ubuntu"
-}
-
-variable "region" {
-  description = "The AWS region where resources will be deployed."
-  type        = string
-  default     = "us-east-1"
 }
 
 variable "app_version" {
@@ -15,9 +8,32 @@ variable "app_version" {
   type        = string
 }
 
-variable "ami_owner" {
-  description = "The AWS account ID that owns the AMI."
+variable "name" {
+  description = "The identifier assigned to resources for easier management."
   type        = string
+}
+
+variable "region" {
+  description = "The AWS region where resources will be deployed."
+  type        = string
+}
+
+variable "subnet_id" {
+  description = "The ID of the target subnet where the virtual machine will be deployed."
+  type        = string
+}
+
+variable "vpc_id" {
+  description = "The ID of the target VPC where the virtual machine will be deployed."
+  type        = string
+}
+
+# -- Optional variables --
+
+variable "admin_user_name" {
+  description = "The admin user account to be created on the virtual machine."
+  type        = string
+  default     = "ubuntu"
 }
 
 variable "ingress_cidr_blocks" {
@@ -30,38 +46,6 @@ variable "ingress_cidr_ssh_blocks" {
   description = "A list of CIDR blocks allowed SSH access to the instance."
   type        = list(string)
   default     = ["0.0.0.0/0"]
-}
-
-variable "key_name" {
-  description = "The name of the SSH key pair used for VM access."
-  type        = string
-}
-
-variable "name" {
-  description = "The identifier assigned to resources for easier management."
-  type        = string
-}
-
-variable "oem_name" {
-  description = "The OEM name associated with the virtual machine."
-  type        = string
-  default     = "edgemanager"
-}
-
-variable "ssh_pub_key" {
-  description = "The user-defined public SSH key added to the virtual machine for access."
-  type        = string
-  default     = ""
-}
-
-variable "subnet_id" {
-  description = "The ID of the target subnet where the virtual machine will be deployed."
-  type        = string
-}
-
-variable "vpc_id" {
-  description = "The ID of the target VPC where the virtual machine will be deployed."
-  type        = string
 }
 
 variable "ingress_tcp_ports" {
@@ -83,6 +67,11 @@ variable "ingress_tcp_ports" {
     condition     = contains(var.ingress_tcp_ports, 443)
     error_message = "Port 443 (HTTPS) is required for Litmus Edge Manager functionality."
   }
+
+  validation {
+    condition     = alltrue([for port in var.ingress_tcp_ports : port >= 1 && port <= 65535])
+    error_message = "All TCP ports must be between 1 and 65535."
+  }
 }
 
 variable "ingress_udp_ports" {
@@ -99,4 +88,29 @@ variable "ingress_udp_ports" {
     condition     = alltrue([for port in var.ingress_udp_ports : port >= 1 && port <= 65535])
     error_message = "All UDP ports must be between 1 and 65535."
   }
+}
+
+variable "key_name" {
+  description = "The name of the SSH key pair used for VM access. Required when ssh_enabled = true."
+  type        = string
+  default     = null
+}
+
+variable "oem_name" {
+  description = "The OEM name associated with the virtual machine."
+  type        = string
+  default     = "edgemanager"
+}
+
+variable "ssh_enabled" {
+  description = "Enable SSH access to the virtual machine. When false, no key pair is attached and port 22 is not opened."
+  type        = bool
+  default     = false
+}
+
+variable "ssh_pub_key" {
+  description = "The user-defined public SSH key added to the virtual machine for access."
+  type        = string
+  sensitive   = true
+  default     = ""
 }

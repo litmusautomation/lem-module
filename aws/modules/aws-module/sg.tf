@@ -3,10 +3,6 @@ locals {
 
   udp_ports = var.ingress_udp_ports
 
-  ssh_ports = [
-    22
-  ]
-
   tcp_rules = [
     for port in local.tcp_ports : {
       from_port   = port
@@ -27,15 +23,13 @@ locals {
     }
   ]
 
-  ssh_rule = [
-    for port in local.ssh_ports : {
-      from_port   = port
-      to_port     = port
-      protocol    = "tcp"
-      description = "SSH from specific subnets"
-      cidr_blocks = join(",", var.ingress_cidr_ssh_blocks)
-    }
-  ]
+  ssh_rules = var.ssh_enabled ? [{
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    description = "ssh"
+    cidr_blocks = join(",", var.ingress_cidr_ssh_blocks)
+  }] : []
 }
 
 module "edgemanager_security_group" {
@@ -48,7 +42,7 @@ module "edgemanager_security_group" {
   egress_rules       = ["all-all"]
   egress_cidr_blocks = ["0.0.0.0/0"]
 
-  ingress_with_cidr_blocks = concat(local.tcp_rules, local.udp_rules)
+  ingress_with_cidr_blocks = concat(local.tcp_rules, local.udp_rules, local.ssh_rules)
 
   tags = merge(local.tags, var.tags)
 }

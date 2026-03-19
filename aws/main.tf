@@ -12,6 +12,7 @@ module "edgemanager-aws" {
   image_version   = "${var.oem_name}-${var.app_version}"
   ami_owner       = var.ami_owner
   user_data       = data.cloudinit_config.config.rendered
+  ssh_enabled     = var.ssh_enabled
 
   # optional parameters
   ingress_cidr_blocks     = var.ingress_cidr_blocks

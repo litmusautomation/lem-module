@@ -11,8 +11,10 @@ locals {
       content = <<-EOT
         #cloud-config
 
-        runcmd:
-          - echo ${var.ssh_pub_key} >> /home/${var.admin_user_name}/.ssh/authorized_keys
+        users:
+          - name: ${var.admin_user_name}
+            ssh_authorized_keys:
+              - ${var.ssh_pub_key}
         EOT
     }]
   }
@@ -23,7 +25,7 @@ data "cloudinit_config" "config" {
   base64_encode = false
 
   dynamic "part" {
-    for_each = concat(local.cloudinit.default, local.cloudinit.set_ssh_key)
+    for_each = var.ssh_enabled ? concat(local.cloudinit.default, local.cloudinit.set_ssh_key) : local.cloudinit.default
     content {
       content    = part.value.content
       merge_type = "list(append)+dict(recurse_array)+str()"
