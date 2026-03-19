@@ -5,7 +5,7 @@ provider "azurerm" {
 }
 
 module "edgemanager-example" {
-  source                    = "github.com/litmusautomation/lem-module//azure?ref=LIT-5811-code-improvements"
+  source                    = "github.com/litmusautomation/lem-module//azure?ref=main"
   name                      = var.name
   oem_name                  = var.oem_name
   app_version               = var.app_version
