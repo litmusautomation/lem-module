@@ -22,9 +22,9 @@ These modules deploy the Litmus Edge Manager application on a virtual machine in
 - Which IP ranges (CIDR blocks) can access those ports
 - The admin username on the VM
 - The VM size/instance type
-- SSH key material (Azure always requires it; AWS only uses it if you configure cloud-init separately)
+- SSH key material: Azure always requires `ssh_pub_key` (Azure provider limitation — it registers the key on the VM regardless of SSH access being disabled); AWS accepts `key_name` (EC2 key pair name) and `ssh_pub_key` but neither grants access while SSH is disabled
 
-> **Note on SSH-related optional parameters:** `ssh_enabled`, `ssh_pub_key`, and `ingress_cidr_ssh_blocks` are exposed as optional parameters but will have no functional effect — SSH access is permanently disabled at the module level and cannot be activated through input variables.
+> **Note on SSH-related optional parameters:** `ssh_enabled` and `ingress_cidr_ssh_blocks` are exposed as optional parameters but have no functional effect — SSH is permanently disabled at the module level. On AWS, `ssh_pub_key` is also a no-op while SSH is disabled. On Azure, `ssh_pub_key` is a required input (Azure provider registers it on the VM), but SSH port access remains blocked.
 
 #### Port Configuration
 
@@ -133,7 +133,6 @@ module "edgemanager" {
   vpc_id      = "vpc-xxxxxxxxxxxxxxxxx"
   subnet_id   = "subnet-xxxxxxxxxxxxxxxxx"
   ami_owner   = "123456789012"
-  key_name    = "my-ec2-keypair"
 }
 ```
 
@@ -176,13 +175,13 @@ module "edgemanager" {
 | `vpc_id`                  | VPC ID where resources will be deployed                                                   | string       | n/a                                                                | yes      |
 | `subnet_id`               | Subnet ID for EC2 instances                                                               | string       | n/a                                                                | yes      |
 | `ami_owner`               | AWS account ID owning the AMI                                                             | string       | n/a                                                                | yes      |
-| `key_name`                | Name of the AWS EC2 key pair. Stored with the VM for future use                          | string       | n/a                                                                | yes      |
+| `key_name`                | Name of the AWS EC2 key pair. No access is granted while SSH is disabled                 | string       | `null`                                                             | no       |
 | `oem_name`                | OEM identifier for the deployment                                                         | string       | `"edgemanager"`                                                    | no       |
 | `admin_user_name`         | Admin username created on the virtual machine                                             | string       | `"ubuntu"`                                                         | no       |
 | `ssh_enabled`             | Must remain `false`. SSH is not supported on Edge Manager deployments                     | bool         | `false`                                                            | no       |
-| `ssh_pub_key`             | SSH public key injected into the VM via cloud-init                                       | string       | `""`                                                               | no       |
+| `ssh_pub_key`             | SSH public key for cloud-init injection. No functional effect while SSH is disabled      | string       | `""`                                                               | no       |
 | `ingress_cidr_blocks`     | CIDR blocks for application ingress. Restrict to your org's IP ranges in production      | list(string) | `["0.0.0.0/0"]`                                                    | no       |
-| `ingress_cidr_ssh_blocks` | CIDR blocks for SSH ingress (reserved for future use when SSH is enabled)                 | list(string) | `["0.0.0.0/0"]`                                                    | no       |
+| `ingress_cidr_ssh_blocks` | CIDR blocks for SSH ingress. No functional effect while SSH is disabled                  | list(string) | `["0.0.0.0/0"]`                                                    | no       |
 | `ingress_tcp_ports`       | TCP ports to open. Must include 443. Must not include 22. See [Port Configuration](#port-configuration) | list(number) | `[80, 443, 8883, 9092, 8446, 9093, 8123, 8543, 9000, 9004, 9090]` | no       |
 | `ingress_udp_ports`       | UDP ports to open. Must include 51820. See [Port Configuration](#port-configuration)     | list(number) | `[51820, 123]`                                                     | no       |
 
@@ -280,7 +279,7 @@ module "edgemanager" {
 | `admin_user_name`           | Admin username created on the virtual machine                                             | string       | `"ubuntu"`                                                         | no       |
 | `ssh_enabled`               | Must remain `false`. SSH is not supported on Edge Manager deployments                     | bool         | `false`                                                            | no       |
 | `ingress_cidr_blocks`       | CIDR blocks for application ingress. Restrict to your org's IP ranges in production      | list(string) | `["0.0.0.0/0"]`                                                    | no       |
-| `ingress_cidr_ssh_blocks`   | CIDR blocks for SSH ingress (reserved for future use when SSH is enabled)                 | list(string) | `["0.0.0.0/0"]`                                                    | no       |
+| `ingress_cidr_ssh_blocks`   | CIDR blocks for SSH ingress. No functional effect while SSH is disabled                  | list(string) | `["0.0.0.0/0"]`                                                    | no       |
 | `ingress_tcp_ports`         | TCP ports to open. Must include 443. Must not include 22. See [Port Configuration](#port-configuration) | list(number) | `[80, 443, 8883, 9092, 8446, 9093, 8123, 8543, 9000, 9004, 9090]` | no       |
 | `ingress_udp_ports`         | UDP ports to open. Must include 51820. See [Port Configuration](#port-configuration)     | list(number) | `[51820, 123]`                                                     | no       |
 
