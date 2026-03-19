@@ -6,25 +6,22 @@ These modules deploy the Litmus Edge Manager application on a virtual machine in
 
 - VM is deployed in a **private subnet** — no public IP is assigned
 - Private IP only, with all communication staying within the VPC/VNet
-- **SSH is permanently disabled** — this is enforced by the inner module and cannot be overridden via input variables
-- Port access is fully configurable within defined constraints (see [Port Configuration](#port-configuration))
+- **SSH access is disabled** and enforced at the module level — see [Security Model](#security-model)
+- Port access is configurable within defined constraints — see [Port Configuration](#port-configuration)
 
 #### Security Model
 
-**What is locked and cannot be changed:**
-- SSH (port 22) is hard-locked off at the module level. Setting `ssh_enabled = true` will cause a Terraform validation error. This is by design — SSH access is not supported on Edge Manager deployments.
-- Port 22 cannot be added to `ingress_tcp_ports` — a validation rule rejects it explicitly.
-- Port 443 (HTTPS) must always be present in `ingress_tcp_ports` — it is required for Edge Manager functionality.
-- Port 51820 (WireGuard VPN) must always be present in `ingress_udp_ports` — it is required for Edge Manager connectivity.
+**Locked — cannot be changed:**
+- `ssh_enabled = true` will cause a Terraform validation error. SSH access is not supported on Edge Manager deployments.
+- Port 22 is rejected if added to `ingress_tcp_ports`.
+- Port 443 (HTTPS) and port 51820 (WireGuard VPN) must always be present in their respective port lists.
 
-**What you can configure:**
-- Which TCP and UDP ports are opened (within the constraints above)
-- Which IP ranges (CIDR blocks) can access those ports
-- The admin username on the VM
-- The VM size/instance type
-- SSH key material: Azure always requires `ssh_pub_key` (Azure provider limitation — it registers the key on the VM regardless of SSH access being disabled); AWS accepts `key_name` (EC2 key pair name) and `ssh_pub_key` but neither grants access while SSH is disabled
-
-> **Note on SSH-related optional parameters:** `ssh_enabled` and `ingress_cidr_ssh_blocks` are exposed as optional parameters but have no functional effect — SSH is permanently disabled at the module level. On AWS, `ssh_pub_key` is also a no-op while SSH is disabled. On Azure, `ssh_pub_key` is a required input (Azure provider registers it on the VM), but SSH port access remains blocked.
+**Configurable:**
+- TCP and UDP ports (within the constraints above)
+- CIDR blocks controlling which IP ranges can reach those ports
+- Admin username on the VM
+- VM size/instance type
+- SSH key material — Azure always requires `ssh_pub_key` (Azure provider registers it on the VM even with SSH disabled); on AWS, `key_name` and `ssh_pub_key` are accepted but have no effect while SSH is disabled
 
 #### Port Configuration
 
@@ -156,7 +153,7 @@ module "edgemanager" {
   # optional
   oem_name                = "edgemanager"
   admin_user_name         = "ubuntu"
-  ssh_enabled             = false                    # must remain false — SSH is not supported
+  ssh_enabled             = false
   ssh_pub_key             = "ssh-rsa AAAA... user@host"
   ingress_cidr_blocks     = ["10.0.0.0/8"]          # restrict to your network in production
   ingress_cidr_ssh_blocks = ["10.0.0.0/8"]
@@ -175,13 +172,13 @@ module "edgemanager" {
 | `vpc_id`                  | VPC ID where resources will be deployed                                                   | string       | n/a                                                                | yes      |
 | `subnet_id`               | Subnet ID for EC2 instances                                                               | string       | n/a                                                                | yes      |
 | `ami_owner`               | AWS account ID owning the AMI                                                             | string       | n/a                                                                | yes      |
-| `key_name`                | Name of the AWS EC2 key pair. No access is granted while SSH is disabled                 | string       | `null`                                                             | no       |
+| `key_name`                | AWS EC2 key pair name                                                                     | string       | `null`                                                             | no       |
 | `oem_name`                | OEM identifier for the deployment                                                         | string       | `"edgemanager"`                                                    | no       |
 | `admin_user_name`         | Admin username created on the virtual machine                                             | string       | `"ubuntu"`                                                         | no       |
-| `ssh_enabled`             | Must remain `false`. SSH is not supported on Edge Manager deployments                     | bool         | `false`                                                            | no       |
-| `ssh_pub_key`             | SSH public key for cloud-init injection. No functional effect while SSH is disabled      | string       | `""`                                                               | no       |
+| `ssh_enabled`             | SSH access toggle — always `false`, see [Security Model](#security-model)                 | bool         | `false`                                                            | no       |
+| `ssh_pub_key`             | SSH public key for cloud-init injection                                                   | string       | `""`                                                               | no       |
 | `ingress_cidr_blocks`     | CIDR blocks for application ingress. Restrict to your org's IP ranges in production      | list(string) | `["0.0.0.0/0"]`                                                    | no       |
-| `ingress_cidr_ssh_blocks` | CIDR blocks for SSH ingress. No functional effect while SSH is disabled                  | list(string) | `["0.0.0.0/0"]`                                                    | no       |
+| `ingress_cidr_ssh_blocks` | CIDR blocks for SSH ingress                                                               | list(string) | `["0.0.0.0/0"]`                                                    | no       |
 | `ingress_tcp_ports`       | TCP ports to open. Must include 443. Must not include 22. See [Port Configuration](#port-configuration) | list(number) | `[80, 443, 8883, 9092, 8446, 9093, 8123, 8543, 9000, 9004, 9090]` | no       |
 | `ingress_udp_ports`       | UDP ports to open. Must include 51820. See [Port Configuration](#port-configuration)     | list(number) | `[51820, 123]`                                                     | no       |
 
@@ -213,8 +210,6 @@ module "edgemanager" {
 #### Minimal Example
 
 Required parameters only — uses all module defaults for ports, CIDR blocks, and VM size.
-
-> **Note:** `ssh_pub_key` is always required by the Azure provider to configure the VM, even when SSH access is disabled.
 
 ```hcl
 module "edgemanager" {
@@ -250,11 +245,11 @@ module "edgemanager" {
   virtual_network_name      = "my-vnet"
   subnet_name               = "my-subnet"
   image_resource_group_name = "my-image-resource-group"
-  ssh_pub_key               = "ssh-rsa AAAA... user@host"  # required by Azure provider
+  ssh_pub_key               = "ssh-rsa AAAA... user@host"
 
   # optional
   admin_user_name         = "ubuntu"
-  ssh_enabled             = false                    # must remain false — SSH is not supported
+  ssh_enabled             = false
   ingress_cidr_blocks     = ["10.0.0.0/8"]          # restrict to your network in production
   ingress_cidr_ssh_blocks = ["10.0.0.0/8"]
   ingress_tcp_ports       = [443, 8883, 9092]        # customize to only ports you need
@@ -269,17 +264,17 @@ module "edgemanager" {
 | `name`                      | Name assigned to resources                                                                | string       | n/a                                                                | yes      |
 | `oem_name`                  | OEM identifier for the deployment                                                         | string       | n/a                                                                | yes      |
 | `app_version`               | Application version to deploy                                                             | string       | n/a                                                                | yes      |
-| `subscription_id`           | Azure subscription ID where resources will be deployed (sensitive)                        | string       | n/a                                                                | yes      |
+| `subscription_id`           | Azure subscription ID (sensitive)                                                         | string       | n/a                                                                | yes      |
 | `location`                  | Azure region where resources will be created                                              | string       | n/a                                                                | yes      |
 | `resource_group_name`       | Name of the Azure resource group                                                          | string       | n/a                                                                | yes      |
 | `virtual_network_name`      | Name of the virtual network for the instance                                              | string       | n/a                                                                | yes      |
 | `subnet_name`               | Name of the subnet where the instance will be deployed                                    | string       | n/a                                                                | yes      |
 | `image_resource_group_name` | Name of the resource group hosting the VM image                                           | string       | n/a                                                                | yes      |
-| `ssh_pub_key`               | SSH public key registered with the VM. Required by the Azure provider regardless of `ssh_enabled` | string | n/a                                                          | yes      |
+| `ssh_pub_key`               | SSH public key. Required by the Azure provider — registered on the VM regardless of `ssh_enabled` | string | n/a                                                          | yes      |
 | `admin_user_name`           | Admin username created on the virtual machine                                             | string       | `"ubuntu"`                                                         | no       |
-| `ssh_enabled`               | Must remain `false`. SSH is not supported on Edge Manager deployments                     | bool         | `false`                                                            | no       |
+| `ssh_enabled`               | SSH access toggle — always `false`, see [Security Model](#security-model)                 | bool         | `false`                                                            | no       |
 | `ingress_cidr_blocks`       | CIDR blocks for application ingress. Restrict to your org's IP ranges in production      | list(string) | `["0.0.0.0/0"]`                                                    | no       |
-| `ingress_cidr_ssh_blocks`   | CIDR blocks for SSH ingress. No functional effect while SSH is disabled                  | list(string) | `["0.0.0.0/0"]`                                                    | no       |
+| `ingress_cidr_ssh_blocks`   | CIDR blocks for SSH ingress                                                               | list(string) | `["0.0.0.0/0"]`                                                    | no       |
 | `ingress_tcp_ports`         | TCP ports to open. Must include 443. Must not include 22. See [Port Configuration](#port-configuration) | list(number) | `[80, 443, 8883, 9092, 8446, 9093, 8123, 8543, 9000, 9004, 9090]` | no       |
 | `ingress_udp_ports`         | UDP ports to open. Must include 51820. See [Port Configuration](#port-configuration)     | list(number) | `[51820, 123]`                                                     | no       |
 
